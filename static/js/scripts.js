@@ -1,9 +1,7 @@
-
-
 const content_dir = 'contents/'
 const config_file = 'config.yml'
-const section_names = ['home', 'publications', 'awards']
-
+// 增加三个新目录
+const section_names = ['home', 'risk-control', 'algorithm', 'personal-notes', 'publications', 'awards']
 
 window.addEventListener('DOMContentLoaded', event => {
 
@@ -62,4 +60,4 @@ window.addEventListener('DOMContentLoaded', event => {
             .catch(error => console.log(error));
     })
 
-}); 
+});

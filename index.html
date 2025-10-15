@@ -79,10 +79,36 @@
 
 <body id="page-top">
     <!-- Navigation-->
+<!--    <nav class="header navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">-->
+<!--        <div class="container px-5">-->
+<!--            <a id="page-top-title" class="navbar-brand fw-bold" href="#page-top"></a>-->
+<!--            &lt;!&ndash; <a href="#page-top"><img src="static/assets/img/CUMT_LOGO.svg" style="width: 11rem;"></a> &ndash;&gt;-->
+<!--            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"-->
+<!--                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">-->
+<!--                MENU-->
+<!--                <i class="bi-list"></i>-->
+<!--            </button>-->
+<!--            <div class="collapse navbar-collapse" id="navbarResponsive">-->
+<!--                <ul class="navbar-nav ms-auto me-4 my-3 my-lg-0">-->
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link me-lg-3" href="#page-top">HOME</a>-->
+<!--                    </li>-->
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link me-lg-3" href="#publications">PUBLICATIONS</a>-->
+<!--                    </li>-->
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link me-lg-3" href="#awards">AWARDS</a>-->
+<!--                    </li>-->
+
+<!--                </ul>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </nav>-->
+
+    <!-- Navigation-->
     <nav class="header navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
         <div class="container px-5">
             <a id="page-top-title" class="navbar-brand fw-bold" href="#page-top"></a>
-            <!-- <a href="#page-top"><img src="static/assets/img/CUMT_LOGO.svg" style="width: 11rem;"></a> -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
                 aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 MENU
@@ -90,8 +116,17 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto me-4 my-3 my-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link me-lg-3" href="#page-top">HOME</a>
+                    <!-- Home with dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link me-lg-3 dropdown-toggle" href="#page-top" id="homeDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            HOME
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="homeDropdown">
+                            <li><a class="dropdown-item" href="#risk-control">风控工作</a></li>
+                            <li><a class="dropdown-item" href="#algorithm">算法</a></li>
+                            <li><a class="dropdown-item" href="#personal-notes">个人笔记</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link me-lg-3" href="#publications">PUBLICATIONS</a>
@@ -99,7 +134,6 @@
                     <li class="nav-item">
                         <a class="nav-link me-lg-3" href="#awards">AWARDS</a>
                     </li>
-
                 </ul>
             </div>
         </div>
@@ -124,15 +158,47 @@
     <!-- Photo -->
     
     <!-- Home -->
-    <section class="bg-gradient-primary-to-secondary-light mt5 md5" id="home">
-        <div class="container px-5">
-            <header>
-                <h2 id="home-subtitle"> </h2>
-                <!-- <span class="bi bi-list"></span> -->
-            </header>
-            <div class="main-body" id="home-md"></div>
-        </div>
-    </section>
+        <!-- Home -->
+        <section class="bg-gradient-primary-to-secondary-light mt5 md5" id="home">
+            <div class="container px-5">
+                <header>
+                    <h2 id="home-subtitle"> </h2>
+                </header>
+                <div class="main-body" id="home-md"></div>
+            </div>
+        </section>
+
+        <!-- 风控 -->
+        <section class="bg-gradient-primary-to-secondary-gray mt5 md5" id="risk-control">
+            <div class="container px-5">
+                <header>
+                    <h2><i class="bi bi-shield-check"></i>&nbsp;风控</h2>
+                </header>
+                <div class="main-body" id="risk-control-md"></div>
+            </div>
+        </section>
+
+        <!-- 算法 -->
+        <section class="bg-gradient-primary-to-secondary-light mt5 md5" id="algorithm">
+            <div class="container px-5">
+                <header>
+                    <h2><i class="bi bi-cpu"></i>&nbsp;算法</h2>
+                </header>
+                <div class="main-body" id="algorithm-md"></div>
+            </div>
+        </section>
+
+        <!-- 个人笔记 -->
+        <section class="bg-gradient-primary-to-secondary-gray mt5 md5" id="personal-notes">
+            <div class="container px-5">
+                <header>
+                    <h2><i class="bi bi-journal-text"></i>&nbsp;个人笔记</h2>
+                </header>
+                <div class="main-body" id="personal-notes-md"></div>
+            </div>
+        </section>
+
+
     <!-- Home -->
 
     <!-- Publications -->
