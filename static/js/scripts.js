@@ -6,7 +6,7 @@ let section_names = [];
 const pathname = window.location.pathname;
 
 if (pathname.endsWith('index.html') || pathname === '/') {
-    section_names = ['home', 'publications', 'awards'];
+    section_names = ['home'];
 } else if (pathname.endsWith('risk-control.html')) {
     section_names = ['risk-control'];
 }
