@@ -9,8 +9,8 @@ A senior risk control algorithm engineer at an internet company.
 Email: jrlusiri@gmail.com
 
 #### Education
-M.E., Computer Science and Technology, China University of Mining and Technology(Beijing), 2015—2018.\
-B.E., Computer Science and Technology, Guilin University of Technology, 2011—2015.
+M.E., Earth Exploration and Information Technology, China University of Mining and Technology(Beijing), 2015—2018.\
+B.E., Geophysics, Guilin University of Technology, 2011—2015.
 
 #### Research Interests
 Deep Learning, Internet Risk Control, Machine Learning
