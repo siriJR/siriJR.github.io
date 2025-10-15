@@ -9,10 +9,6 @@ if (pathname.endsWith('index.html') || pathname === '/') {
     section_names = ['home', 'publications', 'awards'];
 } else if (pathname.endsWith('risk-control.html')) {
     section_names = ['risk-control'];
-} else if (pathname.endsWith('algorithm.html')) {
-    section_names = ['algorithm'];
-} else if (pathname.endsWith('personal-notes.html')) {
-    section_names = ['personal-notes'];
 }
 
 window.addEventListener('DOMContentLoaded', event => {

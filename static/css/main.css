@@ -110,16 +110,4 @@ section .main-body{
 }
 
 
-/* 悬停时自动展开下拉菜单 */
-.navbar-nav .dropdown:hover .dropdown-menu {
-    display: block;
-}
-
-/* 确保下拉菜单在移动设备上仍然需要点击 */
-@media (max-width: 991.98px) {
-    .navbar-nav .dropdown:hover .dropdown-menu {
-        display: none;
-    }
-}
-
 
