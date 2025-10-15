@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="风控专业知识页面" />
-    <meta name="author" content="senli1073" />
-    <title>风控专业知识</title>
+    <meta name="description" content="风控专业知识与经验分享" />
+    <meta name="author" content="风控专家" />
+    <title>风控专业博客 | 风险管理与防控策略</title>
 
     <!-- Icon -->
     <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico" />
@@ -28,105 +28,363 @@
     <link type="text/css" href="static/css/styles.css" rel="stylesheet" />
     <link type="text/css" href="static/css/main.css" rel="stylesheet" />
 
+    <!-- 博客自定义样式 -->
+    <style>
+        .blog-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .category-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #4ca1af;
+        }
+
+        .recent-posts {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .post-card {
+            border-left: 3px solid #4ca1af;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .author-bio {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .author-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+    </style>
+
     <!-- Bootstrap core JS-->
     <script type="text/javascript" src="static/js/bootstrap.bundle.min.js"></script>
 
-    <!-- For Compatability -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-
-    <!-- Markdown -->
-    <script type="text/javascript" src="static/js/marked.min.js"></script>
-
-    <!-- Mathematics -->
-    <script>
-        MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']]
-            }
-        };
-    </script>
-    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
     <!-- Core JS-->
     <script type="text/javascript" src="static/js/scripts.js"></script>
-    <script type="text/javascript" src="static/js/js-yaml.min.js"></script>
 
 </head>
 
-<body id="page-top">
+<body>
     <!-- Navigation-->
-    <nav class="header navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
-        <div class="container px-5">
-            <a class="navbar-brand fw-bold" href="index.html">返回首页</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="bi bi-shield-check"></i> 风控博客
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
                 aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                MENU
-                <i class="bi-list"></i>
+                <i class="bi bi-list"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto me-4 my-3 my-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link me-lg-3" href="index.html">HOME</a>
+                        <a class="nav-link me-lg-3" href="index.html">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link me-lg-3" href="risk-control.html">风控</a>
+                        <a class="nav-link me-lg-3 active" href="risk-control.html">风控专题</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link me-lg-3" href="algorithm.html">算法</a>
+                        <a class="nav-link me-lg-3" href="algorithm.html">算法研究</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link me-lg-3" href="personal-notes.html">个人笔记</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link me-lg-3" href="about.html">关于我</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- 风控内容 -->
-    <section class="bg-gradient-primary-to-secondary-gray mt5 md5" id="risk-control">
-        <div class="container px-5">
-            <header>
-                <h2><i class="bi bi-shield-check"></i>&nbsp;风控专业知识</h2>
-            </header>
-            <div class="main-body" id="risk-control-md"></div>
+    <!-- 博客头部 -->
+    <header class="blog-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold">风控专业知识库</h1>
+                    <p class="lead">风险管理 · 防控策略 · 实战经验</p>
+                    <p>分享我在金融科技领域的风控实践经验与专业知识</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+
+                </div>
+            </div>
         </div>
-    </section>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container">
+        <div class="row">
+            <!-- 左侧内容区域 -->
+            <div class="col-lg-8">
+                <!-- 欢迎介绍 -->
+                <section class="mb-5">
+                    <h2 class="mb-4">欢迎来到风控知识库</h2>
+                    <div class="bg-light p-4 rounded">
+                        <p>这里是我个人整理的风控专业知识与实践经验汇总。内容涵盖金融风控、反欺诈、数据安全等多个领域，包括理论框架、实战案例和技术实现。</p>
+                        <p>无论你是风控领域的新手还是资深从业者，希望这里的内容都能为你提供有价值的参考和启发。</p>
+                    </div>
+                </section>
+
+                <!-- 分类导航 -->
+                <section class="mb-5">
+                    <h2 class="mb-4">知识分类</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="category-card card h-100 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="category-icon">
+                                        <i class="bi bi-graph-up"></i>
+                                    </div>
+                                    <h4>金融风控</h4>
+                                    <p>信用评分、贷前审批、贷中监控、贷后管理全流程风险控制</p>
+                                    <a href="financial-risk.html" class="btn btn-outline-primary mt-2">探索更多</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="category-card card h-100 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="category-icon">
+                                        <i class="bi bi-shield-exclamation"></i>
+                                    </div>
+                                    <h4>反欺诈</h4>
+                                    <p>欺诈检测、身份验证、团伙识别、实时防控策略与技术实现</p>
+                                    <a href="anti-fraud.html" class="btn btn-outline-primary mt-2">探索更多</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="category-card card h-100 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="category-icon">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </div>
+                                    <h4>内容风控</h4>
+                                    <p>文本、图像、视频内容安全检测与审核策略</p>
+                                    <a href="content-risk.html" class="btn btn-outline-primary mt-2">探索更多</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="category-card card h-100 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="category-icon">
+                                        <i class="bi bi-database"></i>
+                                    </div>
+                                    <h4>数据安全</h4>
+                                    <p>数据隐私保护、合规性管理、数据生命周期安全控制</p>
+                                    <a href="data-security.html" class="btn btn-outline-primary mt-2">探索更多</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 精选文章 -->
+                <section class="mb-5">
+                    <h2 class="mb-4">精选文章</h2>
+                    <div class="list-group">
+                        <a href="articles/risk-model-development.html" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">风控模型开发全流程指南</h5>
+                                <small>3天前</small>
+                            </div>
+                            <p class="mb-1">从数据准备到模型上线的完整流程与最佳实践</p>
+                            <small>
+                                <span class="tag">模型开发</span>
+                                <span class="tag">数据分析</span>
+                                <span class="tag">实战指南</span>
+                            </small>
+                        </a>
+                        <a href="articles/real-time-fraud-detection.html" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">实时反欺诈系统架构设计</h5>
+                                <small>1周前</small>
+                            </div>
+                            <p class="mb-1">高并发场景下的实时风险决策引擎设计与优化</p>
+                            <small>
+                                <span class="tag">系统架构</span>
+                                <span class="tag">实时计算</span>
+                                <span class="tag">性能优化</span>
+                            </small>
+                        </a>
+                        <a href="articles/ai-content-moderation.html" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">AI在内容风控中的应用实践</h5>
+                                <small>2周前</small>
+                            </div>
+                            <p class="mb-1">自然语言处理与计算机视觉技术在内容审核中的实战案例</p>
+                            <small>
+                                <span class="tag">人工智能</span>
+                                <span class="tag">NLP</span>
+                                <span class="tag">CV</span>
+                            </small>
+                        </a>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="col-lg-4">
+                <!-- 作者简介 -->
+                <div class="author-bio mb-4">
+                    <div class="text-center">
+
+                        <h4>风控从业者</h4>
+                        <p class="text-muted">金融科技风控专家 | 8年行业经验</p>
+                    </div>
+                    <p>专注于风险控制领域，曾在多家金融科技公司负责风控系统设计与策略制定，擅长信用风险模型、反欺诈系统和数据安全体系建设。</p>
+                    <div class="d-flex justify-content-center">
+                        <a href="#" class="btn btn-sm btn-outline-secondary me-2"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary me-2"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary"><i class="bi bi-github"></i></a>
+                    </div>
+                </div>
+
+                <!-- 最新文章 -->
+                <div class="recent-posts mb-4">
+                    <h5>最新文章</h5>
+                    <div class="post-card">
+                        <h6><a href="articles/risk-management-framework.html">现代风险管理框架解析</a></h6>
+                        <small class="text-muted">2024年3月15日</small>
+                    </div>
+                    <div class="post-card">
+                        <h6><a href="articles/behavior-scoring.html">用户行为评分模型实践</a></h6>
+                        <small class="text-muted">2024年3月10日</small>
+                    </div>
+                    <div class="post-card">
+                        <h6><a href="cases/fraud-case-study.html">电商欺诈案例深度分析</a></h6>
+                        <small class="text-muted">2024年3月5日</small>
+                    </div>
+                </div>
+
+                <!-- 标签云 -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">热门标签</h5>
+                        <div class="d-flex flex-wrap">
+                            <span class="tag">风控模型</span>
+                            <span class="tag">反欺诈</span>
+                            <span class="tag">信用评分</span>
+                            <span class="tag">数据安全</span>
+                            <span class="tag">机器学习</span>
+                            <span class="tag">实时计算</span>
+                            <span class="tag">合规</span>
+                            <span class="tag">案例研究</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 订阅表单 -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">订阅更新</h5>
+                        <p class="card-text">获取最新的风控知识分享和行业洞察</p>
+                        <form>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="您的邮箱地址">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">订阅</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <!-- Footer-->
-    <footer class="bg-bottom text-center py-5">
-        <div class="container px-5">
-            <div class="text-white-50 small">
-                <div class="mb-2">© 2024 我的个人网站</div>
-                <a href="https://github.com/senli1073">Github</a>
-                <span class="mx-1">&middot;</span>
-                <a href="https://github.com/senli1073/senli1073.github.io/blob/main/LICENSE">License</a>
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5>风控专业博客</h5>
+                    <p>分享风险管理与防控策略的专业知识平台</p>
+                </div>
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5>快速链接</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html" class="text-white">首页</a></li>
+                        <li><a href="financial-risk.html" class="text-white">金融风控</a></li>
+                        <li><a href="content-risk.html" class="text-white">内容风控</a></li>
+                        <li><a href="about.html" class="text-white">关于我</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5>联系我</h5>
+                    <ul class="list-unstyled">
+                        <li>邮箱: jrlusiri@gmail.com</li>
+                        <li>微信: xxxxx</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2024 风控专业博客. 保留所有权利.</p>
             </div>
         </div>
     </footer>
 
-    <!-- 页面加载后执行 -->
-    <script>
-        // 修改section_names只包含风控内容
-        const content_dir = 'contents/';
-        const config_file = 'config.yml';
-        const section_names = ['risk-control'];
+    <!-- 返回顶部按钮 -->
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
+        <i class="bi bi-arrow-up-short"></i>
+    </a>
 
-        // 加载风控内容
-        window.addEventListener('DOMContentLoaded', event => {
-            // Marked
-            marked.use({ mangle: false, headerIds: false });
-            section_names.forEach((name, idx) => {
-                fetch(content_dir + name + '.md')
-                    .then(response => response.text())
-                    .then(markdown => {
-                        const html = marked.parse(markdown);
-                        document.getElementById(name + '-md').innerHTML = html;
-                    }).then(() => {
-                        // MathJax
-                        MathJax.typeset();
-                    })
-                    .catch(error => console.log(error));
+    <script>
+        // 简单的返回顶部功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const backToTop = document.querySelector('.back-to-top');
+
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 100) {
+                    backToTop.style.display = 'flex';
+                } else {
+                    backToTop.style.display = 'none';
+                }
+            });
+
+            backToTop.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({top: 0, behavior: 'smooth'});
             });
         });
     </script>
