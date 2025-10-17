@@ -18,7 +18,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.8;
             color: #333;
-            padding-top: 2rem;
+            padding-top: 4rem; /* 增加顶部内边距 */
             background-color: #f8f9fa;
         }
 
@@ -71,6 +71,43 @@
             padding: 1.5rem;
             margin: 1.5rem 0;
             overflow-x: auto;
+            position: relative;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .code-lang {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+        }
+
+        .code-copy {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .code-copy:hover {
+            color: var(--secondary-color);
+        }
+
+        .code-copy.copied {
+            color: var(--accent-color);
         }
 
         .image-container {
@@ -149,6 +186,13 @@
             color: white;
         }
 
+        .nav-breadcrumb {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 8px 8px;
+        }
+
         @media (max-width: 768px) {
             .doc-toc {
                 position: static;
@@ -164,8 +208,29 @@
             <a class="navbar-brand" href="content-security-work.html">
                 <i class="bi bi-arrow-left me-2"></i>返回工作记录
             </a>
+            <div class="d-flex">
+                <a href="#" class="btn btn-outline-light btn-sm me-2">
+                    <i class="bi bi-download"></i> PDF
+                </a>
+                <a href="#" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-github"></i> 代码
+                </a>
+            </div>
         </div>
     </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="nav-breadcrumb">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="index.html">首页</a></li>
+                    <li class="breadcrumb-item"><a href="content-security-work.html">风控工作记录</a></li>
+                    <li class="breadcrumb-item active">fastText文本分类</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
 
     <!-- 文档头部 -->
     <header class="doc-header">
@@ -185,9 +250,9 @@
                 </div>
                 <div class="col-lg-4 text-lg-end">
                     <div class="text-white-50">
-                        <p><i class="bi bi-calendar me-2"></i>发布日期: 2024年3月25日</p>
-                        <p><i class="bi bi-clock me-2"></i>阅读时间: 约12分钟</p>
-                        <p><i class="bi bi-person me-2"></i>作者: 风控技术团队</p>
+                        <p><i class="bi bi-calendar me-2"></i>发布日期: 2025年10月17日</p>
+                        <p><i class="bi bi-clock me-2"></i>阅读时间: 约15分钟</p>
+                        <p><i class="bi bi-person me-2"></i>作者: siriJR</p>
                     </div>
                 </div>
             </div>
@@ -286,28 +351,35 @@
                         <p>fastText要求训练数据每行一个样本，格式为：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-plaintext">
-__label__类别前缀 文本内容
-                            </code></pre>
+                            <div class="code-header">
+                                <span class="code-lang">文本格式</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-plaintext">__label__类别前缀 文本内容</code></pre>
                         </div>
 
                         <p>例如：</p>
                         <div class="code-block">
-                            <pre><code class="language-plaintext">
-__label__正常 今天的天气真不错，适合外出散步
+                            <div class="code-header">
+                                <span class="code-lang">文本格式</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-plaintext">__label__正常 今天的天气真不错，适合外出散步
 __label__广告 全新iPhone限时特惠，只要3999元！
 __label__辱骂 你真是个白痴，什么都不懂
 __label__政治敏感 讨论国家领导人是不合适的行为
-__label__其他违规 点击链接领取免费福利：http://example.com
-                            </code></pre>
+__label__其他违规 点击链接领取免费福利：http://example.com</code></pre>
                         </div>
 
                         <h3>3.2 中文文本预处理</h3>
                         <p>中文文本需要先进行分词处理。我们使用jieba分词器：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-python">
-import jieba
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">import jieba
 
 def preprocess_chinese_text(text):
     # 分词
@@ -319,16 +391,18 @@ def preprocess_chinese_text(text):
 # 示例
 text = "今天的天气真不错，适合外出散步"
 processed_text = preprocess_chinese_text(text)
-print(processed_text)  # 输出: 今天 天气 不错 适合 外出 散步
-                            </code></pre>
+print(processed_text)  # 输出: 今天 天气 不错 适合 外出 散步</code></pre>
                         </div>
 
                         <h3>3.3 数据划分</h3>
                         <p>将数据划分为训练集、验证集和测试集：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-python">
-import pandas as pd
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">import pandas as pd
 from sklearn.model_selection import train_test_split
 
 # 读取数据
@@ -350,8 +424,7 @@ def save_fasttext_format(data, filename):
 
 save_fasttext_format(train_data, 'train.txt')
 save_fasttext_format(val_data, 'val.txt')
-save_fasttext_format(test_data, 'test.txt')
-                            </code></pre>
+save_fasttext_format(test_data, 'test.txt')</code></pre>
                         </div>
                     </section>
 
@@ -363,17 +436,22 @@ save_fasttext_format(test_data, 'test.txt')
                         <p>使用pip安装fastText Python包：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-bash">
-pip install fasttext
-                            </code></pre>
+                            <div class="code-header">
+                                <span class="code-lang">Bash</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-bash">pip install fasttext</code></pre>
                         </div>
 
                         <h3>4.2 基础训练</h3>
                         <p>使用默认参数训练模型：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-python">
-import fasttext
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">import fasttext
 
 # 训练模型
 model = fasttext.train_supervised(input='train.txt')
@@ -382,16 +460,18 @@ model = fasttext.train_supervised(input='train.txt')
 model.save_model('model.bin')
 
 # 加载模型
-model = fasttext.load_model('model.bin')
-                            </code></pre>
+model = fasttext.load_model('model.bin')</code></pre>
                         </div>
 
                         <h3>4.3 参数调优</h3>
                         <p>fastText提供多个可调参数，以下是一些重要参数：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-python">
-# 使用调优参数训练模型
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python"># 使用调优参数训练模型
 model = fasttext.train_supervised(
     input='train.txt',
     lr=0.5,            # 学习率
@@ -401,8 +481,7 @@ model = fasttext.train_supervised(
     loss='softmax',    # 损失函数，可选'softmax'或'hs'（分层softmax）
     minCount=5,        # 词频阈值，低于此值的词会被忽略
     verbose=2          # 输出详细日志
-)
-                            </code></pre>
+)</code></pre>
                         </div>
 
                         <div class="note-box">
@@ -418,8 +497,11 @@ model = fasttext.train_supervised(
                         <p>fastText支持自动超参数优化：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-python">
-# 自动超参数优化
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python"># 自动超参数优化
 model = fasttext.train_supervised(
     input='train.txt',
     autotuneValidationFile='val.txt',
@@ -427,8 +509,7 @@ model = fasttext.train_supervised(
 )
 
 # 保存最佳模型
-model.save_model('model_tuned.bin')
-                            </code></pre>
+model.save_model('model_tuned.bin')</code></pre>
                         </div>
                     </section>
 
@@ -440,8 +521,11 @@ model.save_model('model_tuned.bin')
                         <p>使用测试集评估模型性能：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-python">
-# 在测试集上评估
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python"># 在测试集上评估
 def evaluate_model(model, test_file):
     result = model.test(test_file)
     print(f"样本数: {result[0]}")
@@ -460,8 +544,7 @@ def evaluate_model(model, test_file):
 
     return result
 
-evaluate_model(model, 'test.txt')
-                            </code></pre>
+evaluate_model(model, 'test.txt')</code></pre>
                         </div>
 
                         <h3>5.2 性能对比</h3>
@@ -517,8 +600,11 @@ evaluate_model(model, 'test.txt')
                         <p>通过混淆矩阵分析模型在不同类别上的表现：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-python">
-import matplotlib.pyplot as plt
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 
@@ -531,8 +617,7 @@ sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
 plt.title('Confusion Matrix')
 plt.ylabel('True Label')
 plt.xlabel('Predicted Label')
-plt.show()
-                            </code></pre>
+plt.show()</code></pre>
                         </div>
 
                         <div class="image-container">
@@ -551,8 +636,11 @@ plt.show()
                         <p>使用训练好的模型进行预测：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-python">
-# 加载模型
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python"># 加载模型
 model = fasttext.load_model('model_tuned.bin')
 
 # 单个文本预测
@@ -565,16 +653,18 @@ def predict_text(text):
 text = "全新iPhone特价优惠，只要2999元！"
 labels, probs = predict_text(text)
 print(f"预测标签: {labels}")
-print(f"对应概率: {probs}")
-                            </code></pre>
+print(f"对应概率: {probs}")</code></pre>
                         </div>
 
                         <h3>6.2 批量处理</h3>
                         <p>对于大规模数据，可以使用批量预测：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-python">
-import pandas as pd
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">import pandas as pd
 from tqdm import tqdm
 
 def batch_predict(input_file, output_file):
@@ -599,16 +689,18 @@ def batch_predict(input_file, output_file):
 
     return result_df
 
-batch_predict('unlabeled_data.csv', 'classification_results.csv')
-                            </code></pre>
+batch_predict('unlabeled_data.csv', 'classification_results.csv')</code></pre>
                         </div>
 
                         <h3>6.3 API服务</h3>
                         <p>使用Flask创建简单的分类API：</p>
 
                         <div class="code-block">
-                            <pre><code class="language-python">
-from flask import Flask, request, jsonify
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">from flask import Flask, request, jsonify
 import fasttext
 
 app = Flask(__name__)
@@ -638,8 +730,7 @@ def classify_text():
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-                            </code></pre>
+    app.run(host='0.0.0.0', port=5000)</code></pre>
                         </div>
                     </section>
 
@@ -662,4 +753,99 @@ if __name__ == '__main__':
                         <ul>
                             <li>无法捕捉长距离依赖关系</li>
                             <li>对词序信息利用有限</li>
-                            <li>在处理
+                            <li>在处理复杂语义任务时准确率低于深度学习模型</li>
+                        </ul>
+
+                        <h3>7.2 应用场景</h3>
+                        <p>fastText特别适合以下场景：</p>
+                        <ul>
+                            <li>大规模文本分类任务</li>
+                            <li>实时内容审核系统</li>
+                            <li>资源受限环境（如移动端）</li>
+                            <li>快速原型开发和迭代</li>
+                        </ul>
+
+                        <div class="note-box">
+                            <strong>未来工作:</strong> 未来我们将探索fastText与其他模型（如BERT）的集成方案，结合两者的优势，在保持高效的同时提升分类准确率。
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 返回顶部按钮 -->
+    <a href="#" class="back-to-top">
+        <i class="bi bi-arrow-up"></i>
+    </a>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h5>风控内容安全技术文档</h5>
+                    <p>分享最前沿的内容安全技术与实践</p>
+                </div>
+                <div class="col-lg-6 text-lg-end">
+                    <p>© 2025 风控技术团队. 保留所有权利.</p>
+                    <p>
+                        <a href="#" class="text-white me-2"><i class="bi bi-github"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-envelope"></i></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        // 初始化代码高亮
+        hljs.highlightAll();
+
+        // 返回顶部按钮功能
+        const backToTop = document.querySelector('.back-to-top');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+
+        // 代码复制功能
+        document.querySelectorAll('.code-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const codeBlock = this.closest('.code-block');
+                const code = codeBlock.querySelector('code').innerText;
+
+                // 复制到剪贴板
+                navigator.clipboard.writeText(code)
+                    .then(() => {
+                        // 显示复制成功反馈
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<i class="bi bi-check"></i> 已复制';
+                        this.classList.add('copied');
+
+                        // 2秒后恢复原始状态
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                            this.classList.remove('copied');
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('复制失败:', err);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
