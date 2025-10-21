@@ -200,6 +200,30 @@
             margin: 1.5rem 0;
         }
 
+        .risk-indicator {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .risk-high {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .risk-medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .risk-low {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
         @media (max-width: 768px) {
             .doc-toc {
                 position: static;
@@ -212,8 +236,8 @@
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="content-security-work.html">
-                <i class="bi bi-arrow-left me-2"></i>返回工作记录
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-shield-check me-2"></i>内容安全分析系统
             </a>
         </div>
     </nav>
@@ -223,8 +247,8 @@
         <div class="container">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="index.html">首页</a></li>
-                    <li class="breadcrumb-item"><a href="content-security-work.html">风控工作记录</a></li>
+                    <li class="breadcrumb-item"><a href="#">首页</a></li>
+                    <li class="breadcrumb-item"><a href="#">风控工作记录</a></li>
                     <li class="breadcrumb-item active">主题分析系统</li>
                 </ol>
             </nav>
@@ -251,7 +275,7 @@
                 <div class="col-lg-4 text-lg-end">
                     <div class="text-white-50">
                         <p><i class="bi bi-calendar me-2"></i>发布日期: 2025年10月17日</p>
-                        <p><i class="bi bi-person me-2"></i>作者: siriJR</p>
+                        <p><i class="bi bi-person me-2"></i>作者: 风控技术团队</p>
                     </div>
                 </div>
             </div>
@@ -718,7 +742,7 @@
                             <pre><code class="language-plaintext">【主题 0】负面评价
   - 规模: 856 条消息 (8.6%)
   - 关键词: 差评, 垃圾, 不好用, 坑人, 骗钱, 退货
-  - 风险等级: 高
+  - 风险等级: <span class="risk-indicator risk-high">高</span>
   - 代表性内容:
       1. 这个产品太差了，根本不好用
       2. 商家骗钱，大家不要上当
@@ -727,7 +751,7 @@
 【主题 1】敏感话题
   - 规模: 324 条消息 (3.2%)
   - 关键词: 政治, 领导人, 政府, 抗议, 不满, 言论
-  - 风险等级: 高
+  - 风险等级: <span class="risk-indicator risk-high">高</span>
   - 代表性内容:
       1. 对当前政策有些不同看法
       2. 领导人的这个决策不太合理
@@ -736,7 +760,7 @@
 【主题 2】产品咨询
   - 规模: 1,247 条消息 (12.5%)
   - 关键词: 咨询, 价格, 功能, 使用, 购买, 售后
-  - 风险等级: 低
+  - 风险等级: <span class="risk-indicator risk-low">低</span>
   - 代表性内容:
       1. 这个产品有什么功能？
       2. 价格是多少？有优惠吗？
@@ -796,9 +820,7 @@
                         </div>
 
                         <div class="image-container">
-                            <div style="background:#f0f0f0; padding:2rem; border-radius:8px; text-align:center;">
-                                <p>topic_clusters.png</p>
-                            </div>
+                            <img src="topic_clusters.png" alt="主题聚类可视化结果">
                             <div class="image-caption">图2: 主题聚类可视化结果</div>
                         </div>
                     </section>
@@ -819,7 +841,7 @@
 analyzer = ChatTopicAnalyzer(model_name='BAAI/bge-base-zh')
 
 # 1. 加载数据
-csv_file = 'test.csv'#包含有msg字段的聊天样本
+csv_file = 'test.csv'#包含msg字段
 df = analyzer.load_data(csv_file)
 
 # 2. 生成嵌入向量
