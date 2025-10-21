@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>基于LDA与多算法融合的中文短文本主题分析实践 | 风控技术文档</title>
+    <title>基于多算法融合的中文短文本主题分析实践 | 风控技术文档</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
@@ -18,7 +18,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.8;
             color: #333;
-            padding-top: 4rem; /* 增加顶部内边距 */
+            padding-top: 4rem;
             background-color: #f8f9fa;
         }
 
@@ -193,6 +193,13 @@
             border-radius: 0 0 8px 8px;
         }
 
+        .method-comparison {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
         @media (max-width: 768px) {
             .doc-toc {
                 position: static;
@@ -218,7 +225,7 @@
                 <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item"><a href="index.html">首页</a></li>
                     <li class="breadcrumb-item"><a href="content-security-work.html">风控工作记录</a></li>
-                    <li class="breadcrumb-item active">LDA主题分析</li>
+                    <li class="breadcrumb-item active">主题分析系统</li>
                 </ol>
             </nav>
         </div>
@@ -230,20 +237,20 @@
             <div class="row">
                 <div class="col-lg-8">
                     <span class="badge bg-light text-dark mb-2">技术文档</span>
-                    <h1 class="display-5 fw-bold">基于LDA与多算法融合的中文短文本主题分析实践</h1>
-                    <p class="lead">结合LDA、TextRank、TF-IDF和语义分析的主题建模系统，可用于舆情监控</p>
+                    <h1 class="display-5 fw-bold">基于多算法融合的中文短文本主题分析实践</h1>
+                    <p class="lead">面向内容安全与舆情监控的聚类与关键词提取融合方案</p>
                     <div class="d-flex flex-wrap mt-3">
-                        <span class="tag">LDA主题模型</span>
+                        <span class="tag">舆情监控</span>
+                        <span class="tag">内容安全</span>
                         <span class="tag">TextRank</span>
                         <span class="tag">TF-IDF</span>
-                        <span class="tag">语义分析</span>
-                        <span class="tag">自然语言处理</span>
+                        <span class="tag">聚类分析</span>
                         <span class="tag">主题建模</span>
                     </div>
                 </div>
                 <div class="col-lg-4 text-lg-end">
                     <div class="text-white-50">
-                        <p><i class="bi bi-calendar me-2"></i>发布日期: 2025年10月21日</p>
+                        <p><i class="bi bi-calendar me-2"></i>发布日期: 2025年10月17日</p>
                         <p><i class="bi bi-person me-2"></i>作者: siriJR</p>
                     </div>
                 </div>
@@ -263,10 +270,10 @@
                                 <a class="nav-link" href="#introduction">1. 引言</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#algorithm-intro">2. 核心算法详解</a>
+                                <a class="nav-link" href="#industry-methods">2. 业界方法综述</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#data-preparation">3. 数据准备</a>
+                                <a class="nav-link" href="#algorithm-intro">3. 核心算法详解</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#system-design">4. 系统设计与实现</a>
@@ -291,57 +298,75 @@
                     <!-- 摘要 -->
                     <div class="alert alert-info">
                         <h5><i class="bi bi-info-circle"></i> 摘要</h5>
-                        <p class="mb-0">本文详细介绍了一个基于LDA主题模型与多算法融合的中文短文本主题分析系统。系统结合了TF-IDF、TextRank、语义分析和混合方法，通过BERT嵌入和聚类技术实现了高效的主题发现和关键词提取。该方案特别适合处理大规模中文聊天记录、评论等短文本数据。</p>
+                        <p class="mb-0">本文详细介绍了一个面向内容安全与舆情监控的中文短文本主题分析系统。系统结合了聚类分析与多算法关键词提取技术，通过TF-IDF、TextRank、语义分析和混合方法实现了高效的主题发现和风险识别。该系统特别针对中文短文本的特点进行了优化，在内容安全和舆情监控场景中表现出色。</p>
                     </div>
 
                     <!-- 1. 引言 -->
                     <section id="introduction" class="doc-section">
                         <h2>1. 引言</h2>
-                        <p>在风控内容安全领域，主题分析是一项基础且重要的任务。传统主题模型如LDA（Latent Dirichlet Allocation）在处理短文本时面临稀疏性问题，而单一的关键词提取方法往往难以全面捕捉文本语义。</p>
+                        <p>在当今数字化时代，内容安全和舆情监控已成为企业和政府机构不可或缺的重要工作。随着社交媒体、论坛、评论区等用户生成内容的爆炸式增长，如何从海量短文本中快速识别关键主题、发现潜在风险，成为了风控领域的核心挑战。</p>
 
-                        <p>本文介绍的主题分析系统通过多算法融合的方式，结合传统统计方法和现代深度学习技术，实现了更准确、更全面的主题建模。系统特别针对中文短文本的特点进行了优化，包括处理口语化表达、网络用语和多样化的表达方式。</p>
+                        <p>传统的内容审核方法主要依赖人工审核或基于规则的系统，效率低下且难以应对新型风险。本文介绍的主题分析系统通过聚类分析与多算法关键词提取的融合方案，实现了自动化、智能化的内容主题发现和风险评估。</p>
 
                         <div class="note-box">
-                            <strong>应用场景:</strong> 该系统特别适合处理社交媒体聊天记录、用户评论、客服对话等短文本数据，可用于内容审核、用户画像构建、话题发现等多个场景。
+                            <strong>应用场景:</strong> 该系统特别适合处理社交媒体聊天记录、用户评论、新闻评论等短文本数据，可用于内容审核、舆情监控、风险预警、用户画像构建等多个场景。
                         </div>
                     </section>
 
-                    <!-- 2. 核心算法详解 -->
-                    <section id="algorithm-intro" class="doc-section">
-                        <h2>2. 核心算法详解</h2>
+                    <!-- 2. 业界方法综述 -->
+                    <section id="industry-methods" class="doc-section">
+                        <h2>2. 业界方法综述</h2>
 
-                        <h3>2.1 LDA主题模型</h3>
-                        <p>LDA（Latent Dirichlet Allocation）是一种经典的概率主题模型，它假设每个文档是由多个主题混合而成，而每个主题又是由一组词语的概率分布表示。</p>
+                        <h3>2.1 传统主题模型方法</h3>
+                        <p>在主题分析领域，业界有多种成熟的技术方案：</p>
+
+                        <div class="method-comparison">
+                            <h5>LDA (Latent Dirichlet Allocation)</h5>
+                            <p>LDA是一种经典的概率主题模型，假设每个文档由多个主题混合而成。它在处理长文本时表现良好，但对于短文本存在稀疏性问题。</p>
+
+                            <h5>NMF (Non-negative Matrix Factorization)</h5>
+                            <p>非负矩阵分解通过矩阵分解发现文本的潜在主题结构，计算效率高，但对初始值敏感。</p>
+
+                            <h5>BERTopic</h5>
+                            <p>结合BERT嵌入和聚类算法的现代主题建模方法，能够生成语义连贯的主题，但计算成本较高。</p>
+                        </div>
+
+                        <h3>2.2 基于深度学习的方法</h3>
+                        <p>随着深度学习技术的发展，基于神经网络的文本分析方法日益普及：</p>
+
+                        <ul>
+                            <li><strong>预训练语言模型</strong>: 如BERT、RoBERTa等，通过在大规模语料上预训练，学习丰富的语言表示</li>
+                            <li><strong>序列标注模型</strong>: 使用BiLSTM-CRF等模型进行实体识别和关键词提取</li>
+                            <li><strong>图神经网络</strong>: 应用于文本关系建模，增强语义理解能力</li>
+                        </ul>
+
+                        <h3>2.3 本系统方案特点</h3>
+                        <p>与上述方法相比，本系统采用聚类+多算法关键词提取的融合方案，具有以下优势：</p>
 
                         <div class="code-block">
                             <div class="code-header">
-                                <span class="code-lang">Python</span>
-                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                <span class="code-lang">系统特点</span>
                             </div>
-                            <pre><code class="language-python"># LDA模型的基本实现
-from gensim import corpora, models
-
-# 创建词典和语料库
-dictionary = corpora.Dictionary(processed_docs)
-corpus = [dictionary.doc2bow(doc) for doc in processed_docs]
-
-# 训练LDA模型
-lda_model = models.LdaModel(
-    corpus=corpus,
-    id2word=dictionary,
-    num_topics=10,
-    random_state=42,
-    passes=10,
-    alpha='auto',
-    per_word_topics=True
-)
-
-# 查看主题
-for idx, topic in lda_model.print_topics(-1):
-    print(f"主题 {idx}: {topic}")</code></pre>
+                            <pre><code class="language-plaintext">1. 专门针对中文短文本优化
+2. 结合传统统计方法和现代语义分析
+3. 支持多种聚类算法和关键词提取方法
+4. 提供灵活的参数配置和算法组合
+5. 完整的预处理和结果可视化流程</code></pre>
                         </div>
 
-                        <h3>2.2 TF-IDF算法</h3>
+                        <div class="note-box">
+                            <strong>技术选型说明:</strong> 本系统选用BAAI/bge-base-zh作为预训练模型，该模型在中文语义理解任务上表现优异，特别适合处理中文短文本。同时，系统保留了传统方法的优势，确保在不同场景下都能获得良好效果。
+                        </div>
+                    </section>
+
+                    <!-- 3. 核心算法详解 -->
+                    <section id="algorithm-intro" class="doc-section">
+                        <h2>3. 核心算法详解</h2>
+
+                        <h3>3.1 预训练模型简介</h3>
+                        <p>本系统使用BAAI/bge-base-zh预训练模型生成文本语义表示。该模型是北京智源人工智能研究院发布的中文语义表示模型，在多项中文自然语言处理任务中表现出色，特别适合处理中文短文本的语义理解。</p>
+
+                        <h3>3.2 TF-IDF算法</h3>
                         <p>TF-IDF（Term Frequency-Inverse Document Frequency）是一种经典的统计方法，用于评估词语在文档中的重要程度。TF表示词频，IDF表示逆文档频率。</p>
 
                         <div class="code-block">
@@ -385,7 +410,7 @@ for idx, topic in lda_model.print_topics(-1):
         return []</code></pre>
                         </div>
 
-                        <h3>2.3 TextRank算法</h3>
+                        <h3>3.3 TextRank算法</h3>
                         <p>TextRank是一种基于图的排序算法，灵感来源于PageRank。它将文本中的词语作为图中的节点，通过词语之间的共现关系构建边，然后计算每个节点的重要性。</p>
 
                         <div class="code-block">
@@ -430,8 +455,8 @@ for idx, topic in lda_model.print_topics(-1):
         return []</code></pre>
                         </div>
 
-                        <h3>2.4 语义分析方法</h3>
-                        <p>基于BERT的语义分析方法利用预训练语言模型生成文本的语义表示，通过计算词语与整体语义中心的相似度来提取关键词。</p>
+                        <h3>3.4 语义分析方法</h3>
+                        <p>基于预训练模型的语义分析方法利用深度学习模型生成文本的语义表示，通过计算词语与整体语义中心的相似度来提取关键词。</p>
 
                         <div class="code-block">
                             <div class="code-header">
@@ -500,7 +525,7 @@ for idx, topic in lda_model.print_topics(-1):
     return results[:top_k]</code></pre>
                         </div>
 
-                        <h3>2.5 混合方法</h3>
+                        <h3>3.5 混合方法</h3>
                         <p>混合方法综合了TF-IDF、TextRank和语义分析三种方法的优势，通过加权投票机制得到最终的关键词排名。</p>
 
                         <div class="code-block">
@@ -545,95 +570,6 @@ for idx, topic in lda_model.print_topics(-1):
                         </div>
                     </section>
 
-                    <!-- 3. 数据准备 -->
-                    <section id="data-preparation" class="doc-section">
-                        <h2>3. 数据准备</h2>
-
-                        <h3>3.1 数据加载与预处理</h3>
-                        <p>系统支持从CSV文件加载数据，并进行多层次的文本预处理：</p>
-
-                        <div class="code-block">
-                            <div class="code-header">
-                                <span class="code-lang">Python</span>
-                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
-                            </div>
-                            <pre><code class="language-python">def load_data(self, file_path: str) -> pd.DataFrame:
-    """
-    加载数据
-    """
-    self.df = pd.read_csv(file_path, on_bad_lines='skip')
-    print(f"数据加载成功，共 {len(self.df)} 条记录")
-    return self.df
-
-def preprocess_text(self, text: str) -> str:
-    """
-    文本预处理 - 增强版本
-    """
-    if pd.isna(text):
-        return ""
-
-    # 使用自定义预处理
-    text = tl.preProcess(str(text).strip().lower())
-
-    # 过滤过短的文本
-    if len(text) < 2:
-        return ""
-
-    return text</code></pre>
-                        </div>
-
-                        <h3>3.2 中文分词与过滤</h3>
-                        <p>针对中文文本特点，系统实现了精细化的分词和过滤策略：</p>
-
-                        <div class="code-block">
-                            <div class="code-header">
-                                <span class="code-lang">Python</span>
-                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
-                            </div>
-                            <pre><code class="language-python">def _segment_and_filter(self, texts: List[str]) -> List[List[str]]:
-    """
-    统一的分词和过滤处理
-    """
-    segmented_results = []
-    for text in texts:
-        # 使用jieba分词并获取词性
-        words_with_pos = jieba.posseg.cut(text)
-        filtered_words = []
-
-        for word, pos in words_with_pos:
-            # 词性过滤 + 基础过滤
-            if (pos[0] in self.allowed_pos and
-                    self._is_meaningful_word(word)):
-                filtered_words.append(word)
-
-        segmented_results.append(filtered_words)
-
-    return segmented_results
-
-def _is_meaningful_word(self, word: str) -> bool:
-    """
-    判断词语是否有实际意义
-    """
-    # 基础过滤
-    if (len(word) <= 1 or
-            word in self.extended_stop_words or
-            word.isdigit() or
-            word.encode('utf-8').isalpha()):
-        return False
-
-    # 模式匹配过滤
-    for pattern in self.meaningless_patterns:
-        if re.match(pattern, word):
-            return False
-
-    return True</code></pre>
-                        </div>
-
-                        <div class="note-box">
-                            <strong>预处理优化:</strong> 系统采用词性过滤、停用词过滤、模式匹配过滤等多重策略，有效去除无意义词汇，提高主题分析质量。
-                        </div>
-                    </section>
-
                     <!-- 4. 系统设计与实现 -->
                     <section id="system-design" class="doc-section">
                         <h2>4. 系统设计与实现</h2>
@@ -643,46 +579,14 @@ def _is_meaningful_word(self, word: str) -> bool:
 
                         <div class="image-container">
                             <div style="background:#f0f0f0; padding:2rem; border-radius:8px; text-align:center;">
-                                <p>数据输入 → 文本预处理 → BERT嵌入生成 → 聚类分析 → 主题生成 → 结果输出</p>
+                                <p>数据输入 → 文本预处理 → 嵌入生成 → 聚类分析 → 主题生成 → 结果输出</p>
                                 <p>↑</p>
                                 <p>多算法关键词提取 (TF-IDF + TextRank + 语义分析 + 混合方法)</p>
                             </div>
                             <div class="image-caption">图1: 系统架构示意图</div>
                         </div>
 
-                        <h3>4.2 嵌入向量生成</h3>
-                        <p>使用BERT模型生成高质量的文本语义表示：</p>
-
-                        <div class="code-block">
-                            <div class="code-header">
-                                <span class="code-lang">Python</span>
-                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
-                            </div>
-                            <pre><code class="language-python">def generate_embeddings(self) -> np.ndarray:
-    """
-    生成文本嵌入向量
-    """
-    if self.df is None:
-        raise ValueError("请先加载数据")
-
-    # 预处理文本
-    self.df['processed_msg'] = self.df['msg'].apply(self.preprocess_text)
-
-    # 过滤空文本和过短文本
-    valid_mask = (self.df['processed_msg'].str.len() > 3)  # 至少3个字符
-    self.valid_indices = self.df[valid_mask].index  # 保存有效文本的索引
-    valid_texts = self.df.loc[self.valid_indices, 'processed_msg'].tolist()
-
-    print(f"生成嵌入向量，有效文本数量: {len(valid_texts)}")
-
-    # 生成嵌入向量
-    self.embeddings = self.model.encode(valid_texts, show_progress_bar=True)
-    print(f"嵌入向量生成完成，维度: {self.embeddings.shape}")
-
-    return self.embeddings</code></pre>
-                        </div>
-
-                        <h3>4.3 聚类分析</h3>
+                        <h3>4.2 聚类分析</h3>
                         <p>系统支持KMeans和DBSCAN两种聚类算法，并包含自动确定最佳聚类数量的功能：</p>
 
                         <div class="code-block">
@@ -722,7 +626,7 @@ def _is_meaningful_word(self, word: str) -> bool:
     return self.cluster_labels</code></pre>
                         </div>
 
-                        <h3>4.4 主题标签生成</h3>
+                        <h3>4.3 主题标签生成</h3>
                         <p>基于关键词和文本内容特征，自动生成有意义的主题标签：</p>
 
                         <div class="code-block">
@@ -803,29 +707,40 @@ def _is_meaningful_word(self, word: str) -> bool:
                             </tbody>
                         </table>
 
-                        <h3>5.2 主题分析效果</h3>
-                        <p>系统在实际聊天数据上的主题分析效果：</p>
+                        <h3>5.2 舆情监控效果</h3>
+                        <p>系统在舆情监控场景中的实际分析效果：</p>
 
                         <div class="code-block">
                             <div class="code-header">
                                 <span class="code-lang">文本</span>
                                 <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
                             </div>
-                            <pre><code class="language-plaintext">【主题 0】音乐娱乐
-  - 规模: 1,247 条消息 (12.5%)
-  - 关键词: 唱歌, 音乐, 好听, 声音, 歌曲, 演唱会
+                            <pre><code class="language-plaintext">【主题 0】负面评价
+  - 规模: 856 条消息 (8.6%)
+  - 关键词: 差评, 垃圾, 不好用, 坑人, 骗钱, 退货
+  - 风险等级: 高
   - 代表性内容:
-      1. 这首歌真好听，我单曲循环一整天了
-      2. 周末有周杰伦的演唱会，一起去吗？
-      3. 你的声音很适合唱情歌
+      1. 这个产品太差了，根本不好用
+      2. 商家骗钱，大家不要上当
+      3. 我要退货，质量太差了
 
-【主题 1】饮食话题
-  - 规模: 983 条消息 (9.8%)
-  - 关键词: 吃饭, 美食, 餐厅, 火锅, 外卖, 好吃
+【主题 1】敏感话题
+  - 规模: 324 条消息 (3.2%)
+  - 关键词: 政治, 领导人, 政府, 抗议, 不满, 言论
+  - 风险等级: 高
   - 代表性内容:
-      1. 中午去哪吃饭？听说新开了家川菜馆
-      2. 这家的火锅真的很正宗，强烈推荐
-      3. 晚上点外卖吧，不想做饭了</code></pre>
+      1. 对当前政策有些不同看法
+      2. 领导人的这个决策不太合理
+      3. 我们应该有更多言论自由
+
+【主题 2】产品咨询
+  - 规模: 1,247 条消息 (12.5%)
+  - 关键词: 咨询, 价格, 功能, 使用, 购买, 售后
+  - 风险等级: 低
+  - 代表性内容:
+      1. 这个产品有什么功能？
+      2. 价格是多少？有优惠吗？
+      3. 售后政策怎么样？</code></pre>
                         </div>
 
                         <h3>5.3 可视化分析</h3>
@@ -882,7 +797,7 @@ def _is_meaningful_word(self, word: str) -> bool:
 
                         <div class="image-container">
                             <div style="background:#f0f0f0; padding:2rem; border-radius:8px; text-align:center;">
-                                <p>[此处放置聚类可视化图像]</p>
+                                <p>topic_clusters.png</p>
                             </div>
                             <div class="image-caption">图2: 主题聚类可视化结果</div>
                         </div>
@@ -904,7 +819,7 @@ def _is_meaningful_word(self, word: str) -> bool:
 analyzer = ChatTopicAnalyzer(model_name='BAAI/bge-base-zh')
 
 # 1. 加载数据
-csv_file = 'test.csv'#只有一个msg字段
+csv_file = 'test.csv'#包含有msg字段的聊天样本
 df = analyzer.load_data(csv_file)
 
 # 2. 生成嵌入向量
@@ -932,88 +847,55 @@ print("生成分析报告...")
 analyzer.generate_report(topic_analysis, 'topic_analysis_report.txt')</code></pre>
                         </div>
 
-                        <h3>6.2 结果导出</h3>
-                        <p>系统支持多种格式的结果导出，便于后续分析和使用：</p>
+                        <h3>6.2 舆情监控集成</h3>
+                        <p>系统可以方便地集成到舆情监控平台中：</p>
 
                         <div class="code-block">
                             <div class="code-header">
                                 <span class="code-lang">Python</span>
                                 <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
                             </div>
-                            <pre><code class="language-python">def save_topic_details(self, save_path: str = None):
-    """
-    保存每句话对应的主题明细到CSV文件
-    """
-    if self.df is None or 'cluster' not in self.df.columns:
-        raise ValueError("请先进行聚类分析")
+                            <pre><code class="language-python">class PublicOpinionMonitor:
+    def __init__(self, topic_analyzer):
+        self.analyzer = topic_analyzer
+        self.risk_keywords = {
+            'high': ['诈骗', '骗钱', '垃圾', '差评', '抗议', '政治'],
+            'medium': ['不满', '投诉', '问题', '缺点', '不好'],
+            'low': ['咨询', '建议', '疑问', '了解']
+        }
 
-    # 创建主题明细DataFrame
-    topic_details = self.df[['msg', 'processed_msg', 'cluster']].copy()
+    def assess_risk_level(self, topic_analysis):
+        """评估主题风险等级"""
+        risk_assessment = {}
 
-    # 获取主题分析结果来添加主题标签
-    topic_analysis = self.analyze_topics()
-    topic_label_map = {}
-    for topic_id, analysis in topic_analysis.items():
-        topic_label_map[topic_id] = analysis['topic_label']
+        for topic_id, analysis in topic_analysis.items():
+            risk_score = 0
+            keywords = analysis['keywords']
 
-    # 添加主题标签说明
-    def get_topic_label(cluster_id):
-        if cluster_id == -2:
-            return "无效文本(预处理后为空)"
-        elif cluster_id == -1:
-            return "噪声点"
-        else:
-            return topic_label_map.get(cluster_id, f"主题{cluster_id}")
+            # 根据关键词计算风险分数
+            for word in keywords:
+                if word in self.risk_keywords['high']:
+                    risk_score += 3
+                elif word in self.risk_keywords['medium']:
+                    risk_score += 2
+                elif word in self.risk_keywords['low']:
+                    risk_score += 1
 
-    topic_details['topic_label'] = topic_details['cluster'].apply(get_topic_label)
+            # 确定风险等级
+            if risk_score >= 5:
+                risk_level = '高'
+            elif risk_score >= 3:
+                risk_level = '中'
+            else:
+                risk_level = '低'
 
-    # 重新排列列顺序
-    topic_details = topic_details[['msg', 'processed_msg', 'cluster', 'topic_label']]
+            risk_assessment[topic_id] = {
+                'risk_score': risk_score,
+                'risk_level': risk_level,
+                'topic_label': analysis['topic_label']
+            }
 
-    if save_path is None:
-        save_path = 'topic_details.csv'
-
-    topic_details.to_csv(save_path, index=False, encoding='utf-8-sig')
-    print(f"主题明细已保存至: {save_path}")
-
-    return topic_details</code></pre>
-                        </div>
-
-                        <h3>6.3 系统集成</h3>
-                        <p>主题分析系统可以方便地集成到现有的风控系统中：</p>
-
-                        <div class="code-block">
-                            <div class="code-header">
-                                <span class="code-lang">Python</span>
-                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
-                            </div>
-                            <pre><code class="language-python">class ChatTopicAnalyzer:
-    def __init__(self, model_name='BAAI/bge-base-zh'):
-        """
-        初始化主题分析器
-        Args:
-            model_name: 使用的sentence transformer模型
-        """
-        self.model = SentenceTransformer(model_name)
-        self.embeddings = None
-        self.cluster_labels = None
-        self.df = None
-        self.valid_indices = None
-
-        # 扩展停用词列表
-        self.extended_stop_words = self._get_extended_stop_words()
-
-        # 无意义词模式
-        self.meaningless_patterns = [
-            r'^[嘛呢吧啊呀哦嗯哈呵唉喔哇]$',
-            r'^[是不是有没有能不能会不会]$',
-            r'^[这个那个这些那些这样那样]$',
-            r'^[然后所以因为但是不过可是]$',
-            r'^[哈哈呵呵嘿嘿嘻嘻哈哈]$'
-        ]
-
-        # 词性白名单（只保留这些词性的词）
-        self.allowed_pos = {'n', 'v', 'a', 'vn', 'an', 'nr', 'ns', 'nt', 'nz'}</code></pre>
+        return risk_assessment</code></pre>
                         </div>
                     </section>
 
@@ -1021,28 +903,28 @@ analyzer.generate_report(topic_analysis, 'topic_analysis_report.txt')</code></pr
                     <section id="conclusion" class="doc-section">
                         <h2>7. 总结</h2>
 
-                        <p>本文详细介绍了基于LDA主题模型与多算法融合的中文短文本主题分析系统。该系统通过结合传统统计方法和现代深度学习技术，实现了高效准确的主题发现和关键词提取。</p>
+                        <p>本文详细介绍了基于多算法融合的中文短文本主题分析系统，特别针对内容安全和舆情监控场景进行了优化。该系统通过聚类分析与多算法关键词提取的融合方案，实现了高效准确的主题发现和风险评估。</p>
 
                         <h3>7.1 技术亮点</h3>
                         <ul>
                             <li><strong>多算法融合</strong>: 综合TF-IDF、TextRank、语义分析和混合方法的优势</li>
                             <li><strong>中文优化</strong>: 针对中文短文本特点进行专门优化</li>
                             <li><strong>智能聚类</strong>: 支持自动确定最佳聚类数量</li>
-                            <li><strong>语义理解</strong>: 利用BERT模型增强语义理解能力</li>
+                            <li><strong>语义理解</strong>: 利用预训练模型增强语义理解能力</li>
                             <li><strong>完整流程</strong>: 提供从数据预处理到结果可视化的完整解决方案</li>
                         </ul>
 
-                        <h3>7.2 应用价值</h3>
-                        <p>该系统在风控内容安全领域具有重要应用价值：</p>
+                        <h3>7.2 在内容安全中的应用价值</h3>
+                        <p>该系统在内容安全和舆情监控领域具有重要应用价值：</p>
                         <ul>
-                            <li><strong>内容审核</strong>: 自动识别和分类用户生成内容</li>
-                            <li><strong>用户画像</strong>: 基于聊天主题构建用户兴趣画像</li>
-                            <li><strong>话题发现</strong>: 实时发现热点话题和趋势</li>
-                            <li><strong>风险预警</strong>: 识别异常话题和潜在风险</li>
+                            <li><strong>风险内容识别</strong>: 自动发现负面评价、敏感话题等风险内容</li>
+                            <li><strong>舆情趋势分析</strong>: 实时监控舆情动态，发现热点话题</li>
+                            <li><strong>自动化审核</strong>: 减少人工审核工作量，提高审核效率</li>
+                            <li><strong>预警机制</strong>: 对高风险内容进行及时预警</li>
                         </ul>
 
                         <div class="note-box">
-                            <strong>未来展望:</strong> 未来我们将探索更多先进的主题建模技术，如动态主题模型、神经主题模型等，进一步提升系统的准确性和实用性。同时，我们计划增加实时分析能力和更丰富的可视化功能。
+                            <strong>未来展望:</strong> 未来我们将探索更多先进的主题建模技术，进一步提升系统的准确性和实用性。同时，我们计划增加实时分析能力和更丰富的可视化功能，为内容安全和舆情监控提供更强大的技术支持。
                         </div>
                     </section>
                 </div>
