@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基于LDA与多算法融合的中文短文本主题分析实践 | 风控技术文档</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            padding-top: 4rem; /* 增加顶部内边距 */
+            background-color: #f8f9fa;
+        }
+
+        .doc-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .doc-toc {
+            position: sticky;
+            top: 2rem;
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .doc-content {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .doc-section {
+            margin-bottom: 3rem;
+        }
+
+        .doc-section h2 {
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .doc-section h3 {
+            color: var(--secondary-color);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .code-block {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .code-lang {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+        }
+
+        .code-copy {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .code-copy:hover {
+            color: var(--secondary-color);
+        }
+
+        .code-copy.copied {
+            color: var(--accent-color);
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .image-caption {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        .note-box {
+            background-color: #e8f4f8;
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background-color: #fef3e2;
+            border-left: 4px solid var(--accent-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+        }
+
+        .performance-table {
+            font-size: 0.9rem;
+        }
+
+        .performance-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .nav-breadcrumb {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 8px 8px;
+        }
+
+        @media (max-width: 768px) {
+            .doc-toc {
+                position: static;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="content-security-work.html">
+                <i class="bi bi-arrow-left me-2"></i>返回工作记录
+            </a>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="nav-breadcrumb">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="index.html">首页</a></li>
+                    <li class="breadcrumb-item"><a href="content-security-work.html">风控工作记录</a></li>
+                    <li class="breadcrumb-item active">LDA主题分析</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 文档头部 -->
+    <header class="doc-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <span class="badge bg-light text-dark mb-2">技术文档</span>
+                    <h1 class="display-5 fw-bold">基于LDA与多算法融合的中文短文本主题分析实践</h1>
+                    <p class="lead">结合LDA、TextRank、TF-IDF和语义分析的主题建模系统，可用于舆情监控</p>
+                    <div class="d-flex flex-wrap mt-3">
+                        <span class="tag">LDA主题模型</span>
+                        <span class="tag">TextRank</span>
+                        <span class="tag">TF-IDF</span>
+                        <span class="tag">语义分析</span>
+                        <span class="tag">自然语言处理</span>
+                        <span class="tag">主题建模</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <div class="text-white-50">
+                        <p><i class="bi bi-calendar me-2"></i>发布日期: 2025年10月21日</p>
+                        <p><i class="bi bi-person me-2"></i>作者: siriJR</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="row">
+            <!-- 文档目录 -->
+            <div class="col-lg-3">
+                <div class="doc-toc">
+                    <h5>文档目录</h5>
+                    <nav id="table-of-contents">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#introduction">1. 引言</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#algorithm-intro">2. 核心算法详解</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#data-preparation">3. 数据准备</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#system-design">4. 系统设计与实现</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#evaluation">5. 性能评估</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#application">6. 应用与部署</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#conclusion">7. 总结</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- 文档内容 -->
+            <div class="col-lg-9">
+                <div class="doc-content">
+                    <!-- 摘要 -->
+                    <div class="alert alert-info">
+                        <h5><i class="bi bi-info-circle"></i> 摘要</h5>
+                        <p class="mb-0">本文详细介绍了一个基于LDA主题模型与多算法融合的中文短文本主题分析系统。系统结合了TF-IDF、TextRank、语义分析和混合方法，通过BERT嵌入和聚类技术实现了高效的主题发现和关键词提取。该方案特别适合处理大规模中文聊天记录、评论等短文本数据。</p>
+                    </div>
+
+                    <!-- 1. 引言 -->
+                    <section id="introduction" class="doc-section">
+                        <h2>1. 引言</h2>
+                        <p>在风控内容安全领域，主题分析是一项基础且重要的任务。传统主题模型如LDA（Latent Dirichlet Allocation）在处理短文本时面临稀疏性问题，而单一的关键词提取方法往往难以全面捕捉文本语义。</p>
+
+                        <p>本文介绍的主题分析系统通过多算法融合的方式，结合传统统计方法和现代深度学习技术，实现了更准确、更全面的主题建模。系统特别针对中文短文本的特点进行了优化，包括处理口语化表达、网络用语和多样化的表达方式。</p>
+
+                        <div class="note-box">
+                            <strong>应用场景:</strong> 该系统特别适合处理社交媒体聊天记录、用户评论、客服对话等短文本数据，可用于内容审核、用户画像构建、话题发现等多个场景。
+                        </div>
+                    </section>
+
+                    <!-- 2. 核心算法详解 -->
+                    <section id="algorithm-intro" class="doc-section">
+                        <h2>2. 核心算法详解</h2>
+
+                        <h3>2.1 LDA主题模型</h3>
+                        <p>LDA（Latent Dirichlet Allocation）是一种经典的概率主题模型，它假设每个文档是由多个主题混合而成，而每个主题又是由一组词语的概率分布表示。</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python"># LDA模型的基本实现
+from gensim import corpora, models
+
+# 创建词典和语料库
+dictionary = corpora.Dictionary(processed_docs)
+corpus = [dictionary.doc2bow(doc) for doc in processed_docs]
+
+# 训练LDA模型
+lda_model = models.LdaModel(
+    corpus=corpus,
+    id2word=dictionary,
+    num_topics=10,
+    random_state=42,
+    passes=10,
+    alpha='auto',
+    per_word_topics=True
+)
+
+# 查看主题
+for idx, topic in lda_model.print_topics(-1):
+    print(f"主题 {idx}: {topic}")</code></pre>
+                        </div>
+
+                        <h3>2.2 TF-IDF算法</h3>
+                        <p>TF-IDF（Term Frequency-Inverse Document Frequency）是一种经典的统计方法，用于评估词语在文档中的重要程度。TF表示词频，IDF表示逆文档频率。</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">def method_tfidf_optimized(self, texts: List[str], top_k: int = 10) -> List[Tuple[str, float]]:
+    """
+    优化的TF-IDF关键词提取方法
+    """
+    if len(texts) < 3:
+        return []
+
+    # 分词和过滤
+    segmented_texts = self._segment_and_filter(texts)
+    text_strings = [' '.join(words) for words in segmented_texts]
+
+    try:
+        # 严格的TF-IDF参数
+        vectorizer = TfidfVectorizer(
+            max_features=100,
+            stop_words=self.extended_stop_words,
+            min_df=1,  # 至少在2个文档中出现
+            max_df=0.7,  # 最多在70%的文档中出现
+            ngram_range=(1, 2)  # 包含1-gram和2-gram
+        )
+
+        X = vectorizer.fit_transform(text_strings)
+        words = vectorizer.get_feature_names_out()
+        scores = np.array(X.sum(axis=0)).flatten()
+
+        # 组合结果
+        results = list(zip(words, scores))
+        results.sort(key=lambda x: x[1], reverse=True)
+
+        return results[:top_k]
+
+    except Exception as e:
+        print(f"TF-IDF提取错误: {e}")
+        return []</code></pre>
+                        </div>
+
+                        <h3>2.3 TextRank算法</h3>
+                        <p>TextRank是一种基于图的排序算法，灵感来源于PageRank。它将文本中的词语作为图中的节点，通过词语之间的共现关系构建边，然后计算每个节点的重要性。</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">def method_textrank(self, texts: List[str], top_k: int = 10) -> List[Tuple[str, float]]:
+    """
+    TextRank关键词提取方法
+    """
+    if len(texts) < 3:
+        return []
+
+    # 合并文本
+    combined_text = ' '.join([' '.join(self._segment_and_filter([text])[0]) for text in texts])
+
+    if len(combined_text.strip()) < 10:
+        return []
+
+    try:
+        # 使用jieba的TextRank实现
+        keywords = jieba.analyse.textrank(
+            combined_text,
+            topK=top_k * 3,  # 多取一些用于过滤
+            withWeight=True,
+            allowPOS=('n', 'vn', 'v', 'a')  # 名词、动名词、动词、形容词
+        )
+
+        # 过滤无意义词
+        filtered_keywords = []
+        for word, score in keywords:
+            if self._is_meaningful_word(word):
+                filtered_keywords.append((word, score))
+            if len(filtered_keywords) >= top_k:
+                break
+
+        return filtered_keywords
+
+    except Exception as e:
+        print(f"TextRank提取错误: {e}")
+        return []</code></pre>
+                        </div>
+
+                        <h3>2.4 语义分析方法</h3>
+                        <p>基于BERT的语义分析方法利用预训练语言模型生成文本的语义表示，通过计算词语与整体语义中心的相似度来提取关键词。</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">def method_semantic(self, texts: List[str], top_k: int = 10) -> List[Tuple[str, float]]:
+    """
+    基于语义的关键词提取方法
+    """
+    if len(texts) < 3:
+        return []
+
+    # 生成文本嵌入（如果还没有）
+    if self.embeddings is None:
+        processed_texts = [self.preprocess_text(text) for text in texts]
+        valid_texts = [text for text in processed_texts if len(text) > 3]
+        if len(valid_texts) < 3:
+            return []
+        self.embeddings = self.model.encode(valid_texts, show_progress_bar=True)
+
+    # 提取候选词
+    candidate_words = []
+    word_occurrences = {}
+
+    segmented_texts = self._segment_and_filter(texts)
+
+    for i, words in enumerate(segmented_texts):
+        for word in words:
+            if word not in candidate_words:
+                candidate_words.append(word)
+            if word not in word_occurrences:
+                word_occurrences[word] = []
+            word_occurrences[word].append(i)
+
+    # 过滤低频词
+    candidate_words = [word for word in candidate_words if len(word_occurrences[word]) >= 2]
+
+    if not candidate_words:
+        return []
+
+    # 计算词向量（通过包含该词的文本向量的平均）
+    word_vectors = []
+    valid_candidates = []
+
+    for word in candidate_words:
+        indices = word_occurrences[word]
+        if len(indices) <= len(self.embeddings):
+            word_vector = self.embeddings[indices].mean(axis=0)
+            word_vectors.append(word_vector)
+            valid_candidates.append(word)
+
+    if not valid_candidates:
+        return []
+
+    word_vectors = np.array(word_vectors)
+
+    # 计算与整体语义中心的相似度
+    text_center = self.embeddings.mean(axis=0)
+    similarities = cosine_similarity(word_vectors, [text_center]).flatten()
+
+    # 组合结果
+    results = list(zip(valid_candidates, similarities))
+    results.sort(key=lambda x: x[1], reverse=True)
+
+    return results[:top_k]</code></pre>
+                        </div>
+
+                        <h3>2.5 混合方法</h3>
+                        <p>混合方法综合了TF-IDF、TextRank和语义分析三种方法的优势，通过加权投票机制得到最终的关键词排名。</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">def method_hybrid(self, texts: List[str], top_k: int = 10) -> List[Tuple[str, float]]:
+    """
+    混合方法（加权投票）
+    """
+    if len(texts) < 3:
+        return []
+
+    # 获取各种方法的结果
+    tfidf_results = self.method_tfidf_optimized(texts, top_k * 3)
+    textrank_results = self.method_textrank(texts, top_k * 3)
+    semantic_results = self.method_semantic(texts, top_k * 3)
+
+    # 投票得分系统
+    keyword_scores = {}
+
+    # TF-IDF得分（权重0.3）
+    for i, (word, score) in enumerate(tfidf_results):
+        normalized_score = 1.0 - (i / len(tfidf_results))  # 排名归一化
+        keyword_scores[word] = keyword_scores.get(word, 0) + normalized_score * 0.3
+
+    # TextRank得分（权重0.3）
+    for i, (word, score) in enumerate(textrank_results):
+        normalized_score = 1.0 - (i / len(textrank_results))
+        keyword_scores[word] = keyword_scores.get(word, 0) + normalized_score * 0.3
+
+    # 语义得分（权重0.4）
+    for i, (word, score) in enumerate(semantic_results):
+        normalized_score = 1.0 - (i / len(semantic_results))
+        keyword_scores[word] = keyword_scores.get(word, 0) + normalized_score * 0.4
+
+    # 按总分排序
+    sorted_keywords = sorted(keyword_scores.items(), key=lambda x: x[1], reverse=True)
+
+    return [(word, score) for word, score in sorted_keywords[:top_k]]</code></pre>
+                        </div>
+                    </section>
+
+                    <!-- 3. 数据准备 -->
+                    <section id="data-preparation" class="doc-section">
+                        <h2>3. 数据准备</h2>
+
+                        <h3>3.1 数据加载与预处理</h3>
+                        <p>系统支持从CSV文件加载数据，并进行多层次的文本预处理：</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">def load_data(self, file_path: str) -> pd.DataFrame:
+    """
+    加载数据
+    """
+    self.df = pd.read_csv(file_path, on_bad_lines='skip')
+    print(f"数据加载成功，共 {len(self.df)} 条记录")
+    return self.df
+
+def preprocess_text(self, text: str) -> str:
+    """
+    文本预处理 - 增强版本
+    """
+    if pd.isna(text):
+        return ""
+
+    # 使用自定义预处理
+    text = tl.preProcess(str(text).strip().lower())
+
+    # 过滤过短的文本
+    if len(text) < 2:
+        return ""
+
+    return text</code></pre>
+                        </div>
+
+                        <h3>3.2 中文分词与过滤</h3>
+                        <p>针对中文文本特点，系统实现了精细化的分词和过滤策略：</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">def _segment_and_filter(self, texts: List[str]) -> List[List[str]]:
+    """
+    统一的分词和过滤处理
+    """
+    segmented_results = []
+    for text in texts:
+        # 使用jieba分词并获取词性
+        words_with_pos = jieba.posseg.cut(text)
+        filtered_words = []
+
+        for word, pos in words_with_pos:
+            # 词性过滤 + 基础过滤
+            if (pos[0] in self.allowed_pos and
+                    self._is_meaningful_word(word)):
+                filtered_words.append(word)
+
+        segmented_results.append(filtered_words)
+
+    return segmented_results
+
+def _is_meaningful_word(self, word: str) -> bool:
+    """
+    判断词语是否有实际意义
+    """
+    # 基础过滤
+    if (len(word) <= 1 or
+            word in self.extended_stop_words or
+            word.isdigit() or
+            word.encode('utf-8').isalpha()):
+        return False
+
+    # 模式匹配过滤
+    for pattern in self.meaningless_patterns:
+        if re.match(pattern, word):
+            return False
+
+    return True</code></pre>
+                        </div>
+
+                        <div class="note-box">
+                            <strong>预处理优化:</strong> 系统采用词性过滤、停用词过滤、模式匹配过滤等多重策略，有效去除无意义词汇，提高主题分析质量。
+                        </div>
+                    </section>
+
+                    <!-- 4. 系统设计与实现 -->
+                    <section id="system-design" class="doc-section">
+                        <h2>4. 系统设计与实现</h2>
+
+                        <h3>4.1 系统架构</h3>
+                        <p>主题分析系统的整体架构包括数据预处理、嵌入生成、聚类分析和主题生成四个核心模块：</p>
+
+                        <div class="image-container">
+                            <div style="background:#f0f0f0; padding:2rem; border-radius:8px; text-align:center;">
+                                <p>数据输入 → 文本预处理 → BERT嵌入生成 → 聚类分析 → 主题生成 → 结果输出</p>
+                                <p>↑</p>
+                                <p>多算法关键词提取 (TF-IDF + TextRank + 语义分析 + 混合方法)</p>
+                            </div>
+                            <div class="image-caption">图1: 系统架构示意图</div>
+                        </div>
+
+                        <h3>4.2 嵌入向量生成</h3>
+                        <p>使用BERT模型生成高质量的文本语义表示：</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">def generate_embeddings(self) -> np.ndarray:
+    """
+    生成文本嵌入向量
+    """
+    if self.df is None:
+        raise ValueError("请先加载数据")
+
+    # 预处理文本
+    self.df['processed_msg'] = self.df['msg'].apply(self.preprocess_text)
+
+    # 过滤空文本和过短文本
+    valid_mask = (self.df['processed_msg'].str.len() > 3)  # 至少3个字符
+    self.valid_indices = self.df[valid_mask].index  # 保存有效文本的索引
+    valid_texts = self.df.loc[self.valid_indices, 'processed_msg'].tolist()
+
+    print(f"生成嵌入向量，有效文本数量: {len(valid_texts)}")
+
+    # 生成嵌入向量
+    self.embeddings = self.model.encode(valid_texts, show_progress_bar=True)
+    print(f"嵌入向量生成完成，维度: {self.embeddings.shape}")
+
+    return self.embeddings</code></pre>
+                        </div>
+
+                        <h3>4.3 聚类分析</h3>
+                        <p>系统支持KMeans和DBSCAN两种聚类算法，并包含自动确定最佳聚类数量的功能：</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">def cluster_texts(self, n_clusters: int = None, method: str = 'kmeans') -> np.ndarray:
+    """
+    对文本进行聚类
+    """
+    if self.embeddings is None:
+        self.generate_embeddings()
+
+    if method == 'kmeans':
+        if n_clusters is None:
+            # 使用肘部法则确定聚类数量
+            n_clusters = self._find_optimal_clusters()
+            print(f"自动确定的聚类数量: {n_clusters}")
+
+        clusterer = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+        self.cluster_labels = clusterer.fit_predict(self.embeddings)
+
+    elif method == 'dbscan':
+        # 使用UMAP降维后再进行DBSCAN聚类
+        reducer = umap.UMAP(n_components=50, random_state=42)
+        reduced_embeddings = reducer.fit_transform(self.embeddings)
+
+        clusterer = DBSCAN(eps=0.5, min_samples=5)
+        self.cluster_labels = clusterer.fit_predict(reduced_embeddings)
+
+    # 将聚类标签添加到DataFrame中
+    self.df['cluster'] = -2  # 初始化为-2（无效文本）
+    self.df.loc[self.valid_indices, 'cluster'] = self.cluster_labels
+
+    print(f"聚类完成，共 {len(set(self.cluster_labels))} 个聚类")
+    return self.cluster_labels</code></pre>
+                        </div>
+
+                        <h3>4.4 主题标签生成</h3>
+                        <p>基于关键词和文本内容特征，自动生成有意义的主题标签：</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">def generate_topic_labels(self, cluster_texts: List[str], keywords: List[str]) -> str:
+    """
+    为每个聚类生成有意义的主题标签
+    """
+    if not cluster_texts or not keywords:
+        return "未定义主题"
+
+    # 分析文本内容特征
+    text_samples = ' '.join(cluster_texts[:20])  # 取前20个样本进行分析
+
+    # 基于关键词和文本内容生成主题标签
+    if any(word in text_samples for word in ['唱歌', '声音', '听歌', '音乐', '好听']):
+        return "音乐娱乐"
+    elif any(word in text_samples for word in ['睡觉', '休息', '起床', '晚安', '熬夜']):
+        return "作息生活"
+    elif any(word in text_samples for word in ['吃饭', '餐厅', '美食', '火锅', '外卖']):
+        return "饮食话题"
+    # ... 更多类别判断
+    else:
+        # 如果没有匹配到特定类别，使用前3个关键词生成标签
+        return f"{'、'.join(keywords[:3])}相关"</code></pre>
+                        </div>
+                    </section>
+
+                    <!-- 5. 性能评估 -->
+                    <section id="evaluation" class="doc-section">
+                        <h2>5. 性能评估</h2>
+
+                        <h3>5.1 关键词提取方法对比</h3>
+                        <p>我们在相同数据集上对比了四种关键词提取方法的性能：</p>
+
+                        <table class="table table-bordered performance-table">
+                            <thead>
+                                <tr>
+                                    <th>方法</th>
+                                    <th>关键词质量</th>
+                                    <th>处理速度</th>
+                                    <th>内存占用</th>
+                                    <th>适用场景</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>TF-IDF</td>
+                                    <td>中等</td>
+                                    <td>快速</td>
+                                    <td>低</td>
+                                    <td>通用文本、大规模数据</td>
+                                </tr>
+                                <tr>
+                                    <td>TextRank</td>
+                                    <td>良好</td>
+                                    <td>中等</td>
+                                    <td>中等</td>
+                                    <td>长文本、连贯性强的文本</td>
+                                </tr>
+                                <tr>
+                                    <td>语义分析</td>
+                                    <td>优秀</td>
+                                    <td>较慢</td>
+                                    <td>高</td>
+                                    <td>短文本、语义复杂的文本</td>
+                                </tr>
+                                <tr>
+                                    <td>混合方法</td>
+                                    <td>最优</td>
+                                    <td>中等</td>
+                                    <td>高</td>
+                                    <td>高质量关键词提取、重要场景</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>5.2 主题分析效果</h3>
+                        <p>系统在实际聊天数据上的主题分析效果：</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">文本</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-plaintext">【主题 0】音乐娱乐
+  - 规模: 1,247 条消息 (12.5%)
+  - 关键词: 唱歌, 音乐, 好听, 声音, 歌曲, 演唱会
+  - 代表性内容:
+      1. 这首歌真好听，我单曲循环一整天了
+      2. 周末有周杰伦的演唱会，一起去吗？
+      3. 你的声音很适合唱情歌
+
+【主题 1】饮食话题
+  - 规模: 983 条消息 (9.8%)
+  - 关键词: 吃饭, 美食, 餐厅, 火锅, 外卖, 好吃
+  - 代表性内容:
+      1. 中午去哪吃饭？听说新开了家川菜馆
+      2. 这家的火锅真的很正宗，强烈推荐
+      3. 晚上点外卖吧，不想做饭了</code></pre>
+                        </div>
+
+                        <h3>5.3 可视化分析</h3>
+                        <p>系统提供聚类结果的可视化功能，帮助理解主题分布：</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">def visualize_clusters(self, save_path: str = None):
+    """
+    可视化聚类结果
+    """
+    if self.embeddings is None or self.cluster_labels is None:
+        raise ValueError("请先生成嵌入向量并进行聚类")
+
+    # 使用PCA降维到2D进行可视化
+    pca = PCA(n_components=2, random_state=42)
+    embeddings_2d = pca.fit_transform(self.embeddings)
+
+    plt.figure(figsize=(12, 8))
+
+    # 创建颜色映射
+    unique_clusters = set(self.cluster_labels)
+    colors = plt.cm.Set3(np.linspace(0, 1, len(unique_clusters)))
+
+    for i, cluster_id in enumerate(unique_clusters):
+        if cluster_id == -1:  # 噪声点
+            color = 'gray'
+            label = 'Noise'
+            alpha = 0.3
+        else:
+            color = colors[i]
+            label = f'Topic {cluster_id}'
+            alpha = 0.7
+
+        mask = self.cluster_labels == cluster_id
+        plt.scatter(embeddings_2d[mask, 0], embeddings_2d[mask, 1],
+                    c=[color], label=label, alpha=alpha, s=30)
+
+    plt.title('Chat Topics Clustering Visualization', fontsize=16, fontweight='bold')
+    plt.xlabel('PCA Component 1')
+    plt.ylabel('PCA Component 2')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"可视化图已保存至: {save_path}")
+
+    plt.show()</code></pre>
+                        </div>
+
+                        <div class="image-container">
+                            <div style="background:#f0f0f0; padding:2rem; border-radius:8px; text-align:center;">
+                                <p>[此处放置聚类可视化图像]</p>
+                            </div>
+                            <div class="image-caption">图2: 主题聚类可视化结果</div>
+                        </div>
+                    </section>
+
+                    <!-- 6. 应用与部署 -->
+                    <section id="application" class="doc-section">
+                        <h2>6. 应用与部署</h2>
+
+                        <h3>6.1 完整分析流程</h3>
+                        <p>系统提供完整的主题分析流程，从数据加载到结果生成：</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python"># 初始化分析器
+analyzer = ChatTopicAnalyzer(model_name='BAAI/bge-base-zh')
+
+# 1. 加载数据
+csv_file = 'test.csv'#只有一个msg字段
+df = analyzer.load_data(csv_file)
+
+# 2. 生成嵌入向量
+print("正在生成文本嵌入向量...")
+analyzer.generate_embeddings()
+
+# 3. 聚类分析
+print("正在进行文本聚类...")
+analyzer.cluster_texts(method='kmeans', n_clusters=20)
+
+# 4. 主题分析（使用混合方法提取关键词）
+print("正在分析主题...")
+topic_analysis = analyzer.analyze_topics(keyword_method='hybrid')
+
+# 5. 保存主题明细CSV文件
+print("正在保存主题明细...")
+topic_details = analyzer.save_topic_details('topic_details.csv')
+
+# 6. 可视化
+print("生成可视化图表...")
+analyzer.visualize_clusters('topic_clusters.png')
+
+# 7. 生成报告
+print("生成分析报告...")
+analyzer.generate_report(topic_analysis, 'topic_analysis_report.txt')</code></pre>
+                        </div>
+
+                        <h3>6.2 结果导出</h3>
+                        <p>系统支持多种格式的结果导出，便于后续分析和使用：</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">def save_topic_details(self, save_path: str = None):
+    """
+    保存每句话对应的主题明细到CSV文件
+    """
+    if self.df is None or 'cluster' not in self.df.columns:
+        raise ValueError("请先进行聚类分析")
+
+    # 创建主题明细DataFrame
+    topic_details = self.df[['msg', 'processed_msg', 'cluster']].copy()
+
+    # 获取主题分析结果来添加主题标签
+    topic_analysis = self.analyze_topics()
+    topic_label_map = {}
+    for topic_id, analysis in topic_analysis.items():
+        topic_label_map[topic_id] = analysis['topic_label']
+
+    # 添加主题标签说明
+    def get_topic_label(cluster_id):
+        if cluster_id == -2:
+            return "无效文本(预处理后为空)"
+        elif cluster_id == -1:
+            return "噪声点"
+        else:
+            return topic_label_map.get(cluster_id, f"主题{cluster_id}")
+
+    topic_details['topic_label'] = topic_details['cluster'].apply(get_topic_label)
+
+    # 重新排列列顺序
+    topic_details = topic_details[['msg', 'processed_msg', 'cluster', 'topic_label']]
+
+    if save_path is None:
+        save_path = 'topic_details.csv'
+
+    topic_details.to_csv(save_path, index=False, encoding='utf-8-sig')
+    print(f"主题明细已保存至: {save_path}")
+
+    return topic_details</code></pre>
+                        </div>
+
+                        <h3>6.3 系统集成</h3>
+                        <p>主题分析系统可以方便地集成到现有的风控系统中：</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">Python</span>
+                                <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                            </div>
+                            <pre><code class="language-python">class ChatTopicAnalyzer:
+    def __init__(self, model_name='BAAI/bge-base-zh'):
+        """
+        初始化主题分析器
+        Args:
+            model_name: 使用的sentence transformer模型
+        """
+        self.model = SentenceTransformer(model_name)
+        self.embeddings = None
+        self.cluster_labels = None
+        self.df = None
+        self.valid_indices = None
+
+        # 扩展停用词列表
+        self.extended_stop_words = self._get_extended_stop_words()
+
+        # 无意义词模式
+        self.meaningless_patterns = [
+            r'^[嘛呢吧啊呀哦嗯哈呵唉喔哇]$',
+            r'^[是不是有没有能不能会不会]$',
+            r'^[这个那个这些那些这样那样]$',
+            r'^[然后所以因为但是不过可是]$',
+            r'^[哈哈呵呵嘿嘿嘻嘻哈哈]$'
+        ]
+
+        # 词性白名单（只保留这些词性的词）
+        self.allowed_pos = {'n', 'v', 'a', 'vn', 'an', 'nr', 'ns', 'nt', 'nz'}</code></pre>
+                        </div>
+                    </section>
+
+                    <!-- 7. 总结 -->
+                    <section id="conclusion" class="doc-section">
+                        <h2>7. 总结</h2>
+
+                        <p>本文详细介绍了基于LDA主题模型与多算法融合的中文短文本主题分析系统。该系统通过结合传统统计方法和现代深度学习技术，实现了高效准确的主题发现和关键词提取。</p>
+
+                        <h3>7.1 技术亮点</h3>
+                        <ul>
+                            <li><strong>多算法融合</strong>: 综合TF-IDF、TextRank、语义分析和混合方法的优势</li>
+                            <li><strong>中文优化</strong>: 针对中文短文本特点进行专门优化</li>
+                            <li><strong>智能聚类</strong>: 支持自动确定最佳聚类数量</li>
+                            <li><strong>语义理解</strong>: 利用BERT模型增强语义理解能力</li>
+                            <li><strong>完整流程</strong>: 提供从数据预处理到结果可视化的完整解决方案</li>
+                        </ul>
+
+                        <h3>7.2 应用价值</h3>
+                        <p>该系统在风控内容安全领域具有重要应用价值：</p>
+                        <ul>
+                            <li><strong>内容审核</strong>: 自动识别和分类用户生成内容</li>
+                            <li><strong>用户画像</strong>: 基于聊天主题构建用户兴趣画像</li>
+                            <li><strong>话题发现</strong>: 实时发现热点话题和趋势</li>
+                            <li><strong>风险预警</strong>: 识别异常话题和潜在风险</li>
+                        </ul>
+
+                        <div class="note-box">
+                            <strong>未来展望:</strong> 未来我们将探索更多先进的主题建模技术，如动态主题模型、神经主题模型等，进一步提升系统的准确性和实用性。同时，我们计划增加实时分析能力和更丰富的可视化功能。
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 返回顶部按钮 -->
+    <a href="#" class="back-to-top">
+        <i class="bi bi-arrow-up"></i>
+    </a>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h5>风控内容安全技术文档</h5>
+                    <p>分享最前沿的内容安全技术与实践</p>
+                </div>
+                <div class="col-lg-6 text-lg-end">
+                    <p>© 2025 风控技术团队. 保留所有权利.</p>
+                    <p>
+                        <a href="#" class="text-white me-2"><i class="bi bi-github"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-envelope"></i></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        // 初始化代码高亮
+        hljs.highlightAll();
+
+        // 返回顶部按钮功能
+        const backToTop = document.querySelector('.back-to-top');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+
+        // 代码复制功能
+        document.querySelectorAll('.code-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const codeBlock = this.closest('.code-block');
+                const code = codeBlock.querySelector('code').innerText;
+
+                // 复制到剪贴板
+                navigator.clipboard.writeText(code)
+                    .then(() => {
+                        // 显示复制成功反馈
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<i class="bi bi-check"></i> 已复制';
+                        this.classList.add('copied');
+
+                        // 2秒后恢复原始状态
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                            this.classList.remove('copied');
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('复制失败:', err);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
