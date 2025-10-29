@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>账号安全工作记录 | 风控技术文档</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            padding-top: 4rem;
+            background-color: #f8f9fa;
+        }
+
+        .doc-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .doc-toc {
+            position: sticky;
+            top: 2rem;
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .doc-content {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .doc-section {
+            margin-bottom: 3rem;
+        }
+
+        .doc-section h2 {
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .doc-section h3 {
+            color: var(--secondary-color);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .code-block {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .code-lang {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+        }
+
+        .code-copy {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .code-copy:hover {
+            color: var(--secondary-color);
+        }
+
+        .code-copy.copied {
+            color: var(--accent-color);
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .image-caption {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        .note-box {
+            background-color: #e8f4f8;
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background-color: #fef3e2;
+            border-left: 4px solid var(--accent-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+        }
+
+        .performance-table {
+            font-size: 0.9rem;
+        }
+
+        .performance-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .nav-breadcrumb {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* 思维导图样式 */
+        .mindmap-container {
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .mindmap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 800px;
+        }
+
+        .mindmap-level-1 {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .mindmap-level-2 {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .mindmap-level-3 {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .mindmap-node {
+            background: white;
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .mindmap-node:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        .mindmap-node-main {
+            background: var(--primary-color);
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .mindmap-node-secondary {
+            background: var(--secondary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .mindmap-node-tertiary {
+            background: #e8f4f8;
+            color: var(--primary-color);
+        }
+
+        .mindmap-connector {
+            position: absolute;
+            background: var(--secondary-color);
+        }
+
+        .mindmap-horizontal-connector {
+            height: 2px;
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .mindmap-vertical-connector {
+            width: 2px;
+            height: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        @media (max-width: 768px) {
+            .doc-toc {
+                position: static;
+                margin-bottom: 2rem;
+            }
+
+            .mindmap {
+                min-width: 100%;
+            }
+
+            .mindmap-node {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="content-security-work.html">
+                <i class="bi bi-arrow-left me-2"></i>返回工作记录
+            </a>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="nav-breadcrumb">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="index.html">首页</a></li>
+                    <li class="breadcrumb-item"><a href="account-security-work.html">风控工作记录</a></li>
+                    <li class="breadcrumb-item active">账号安全工作记录</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 文档头部 -->
+    <header class="doc-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <span class="badge bg-light text-dark mb-2">技术文档</span>
+                    <h1 class="display-5 fw-bold">账号安全工作记录</h1>
+                    <p class="lead">账号安全风险识别与防控技术实践</p>
+                    <div class="d-flex flex-wrap mt-3">
+                        <span class="tag">账号安全</span>
+                        <span class="tag">虚假注册</span>
+                        <span class="tag">设备指纹</span>
+                        <span class="tag">风控算法</span>
+                        <span class="tag">黑产对抗</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <div class="text-white-50">
+                        <p><i class="bi bi-calendar me-2"></i>发布日期: 2025年10月30日</p>
+                        <p><i class="bi bi-person me-2"></i>作者: siriJR</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="row">
+            <!-- 文档目录 -->
+            <div class="col-lg-3">
+                <div class="doc-toc">
+                    <h5>文档目录</h5>
+                    <nav id="table-of-contents">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#overview">1. 概览</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#account-layer">2. 账号层</a>
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#fake-registration">2.1 虚假注册</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#account-farming">2.2 养号扫号</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#human-machine">2.3 人机对抗</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#device-layer">3. 设备层</a>
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#fake-device">3.1 虚假设备</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#automation-tools">3.2 群控-自动化工具</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#device-forgery">3.3 设备伪造</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#malicious-injection">3.4 恶意注入/篡改</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#environment-detection">3.5 环境检测</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#device-fingerprint">3.6 设备指纹</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- 文档内容 -->
+            <div class="col-lg-9">
+                <div class="doc-content">
+                    <!-- 摘要 -->
+                    <div class="alert alert-info">
+                        <h5><i class="bi bi-info-circle"></i> 摘要</h5>
+                        <p class="mb-0">本文详细记录了账号安全领域的风险识别与防控技术实践，涵盖虚假注册、养号扫号、人机对抗等账号层风险，以及设备指纹、环境检测、恶意注入等设备层防护技术。通过算法与策略相结合的方式，构建全方位的账号安全防护体系。</p>
+                    </div>
+
+                    <!-- 1. 概览 -->
+                    <section id="overview" class="doc-section">
+                        <h2>1. 概览</h2>
+                        <p>账号安全工作主要围绕账号层和设备层两个维度展开，通过多种技术和策略手段识别和防范各类风险行为。</p>
+
+                        <div class="image-container">
+                            <img src="overview-account-security.png" alt="主题聚类可视化结果">
+                            <div class="image-caption">图1: 总体框架</div>
+                        </div>
+                    </section>
+
+                    <!-- 2. 账号层 -->
+                    <section id="account-layer" class="doc-section">
+                        <h2>2. 账号层</h2>
+
+                        <!-- 2.1 虚假注册 -->
+                        <section id="fake-registration" class="doc-subsection">
+                            <h3>2.1 虚假注册</h3>
+
+                            <h4>算法方面</h4>
+                            <p>虚假注册检测主要采用有监督模型、半监督和无监督算法相结合的方式：</p>
+
+                            <h5>二分类有监督模型</h5>
+                            <p>使用XGBoost、LightGBM等算法进行二分类检测：</p>
+                            <ul>
+                                <li><strong>样本选择</strong>：具体业务场景的黑样本（如内容导流黑产、营销薅羊毛黑产等）和白样本（对应场景有异常但不是黑产的用户），黑：白=1:20，黑样本30,000(近三个月)，白样本600,000</li>
+                                <li><strong>特征工程</strong>：
+                                    <ul>
+                                        <li><strong>设备方面</strong>：是否为模拟器、是否开启自动化工具、是否有hook行为、是否多开、是否开启VPN代理、硬盘空间使用率、硬盘空间总存储、开机距今时长（包括熄屏）、开机距今时长（不包括熄屏）、是否开启辅助服务功能、小时-启动时间、系统版本、系统类型、网络类型、sim卡情况、usb状态、电池状态、传感器信息、设备型号等</li>
+                                        <li><strong>IP方面</strong>：是否为代理IP、归属省份、归属省份和手机号归属省份是否一致、是否为机房IP</li>
+                                        <li><strong>手机号方面</strong>：是否为虚拟运营商、是否为物联网号、是否是猫池手机号、是否是接码平台手机号</li>
+                                        <li><strong>行为方面</strong>：是否有触发重要埋点、通过主路径埋点时间间隔、当前时间点、请求频次</li>
+                                        <li><strong>资源关联方面</strong>：
+                                            <ul>
+                                                <li>强介质关系网络：设备、IP、手机号过往站内关联实体及违规用户占比</li>
+                                                <li>弱介质关系网络：导流账号、设备型号+设备风险、IPC、手机号前7位</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><strong>考核指标</strong>：召回率、精确率、新增召回率
+                                    <ul>
+                                        <li>内容场景：召回率=95%、精确率88%，新增召回17%</li>
+                                        <li>营销场景：召回率=86%、精确率85%，新增召回21%</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <h5>半监督图标签传播</h5>
+                            <p>使用LPA算法进行半监督图标签传播，通过已知标签样本推断未知标签样本。</p>
+
+                            <h5>无监督图聚集检测算法</h5>
+                            <p>使用UFA算法进行无监督图聚集检测，识别恶意账户聚集行为：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">算法描述</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-plaintext">2024-07 社区挖掘：基于注册图网络的恶意账户聚集检测模型</code></pre>
+                            </div>
+
+                            <h4>策略方面</h4>
+
+                            <h5>实体资源聚集</h5>
+                            <ul>
+                                <li><strong>设备</strong>：通过注册、登录、私信等站内关系，获取设备一度关系下的手机号、IP、账号、支付账号，以及这些一度关系关联的二度设备，如果关联过多实体则认为是异常；如果这些实体当中二度关联的风险设备占比过高，则认为是高危</li>
+                                <li><strong>手机号</strong>：和设备相类似的资源聚集策略。增加手机号前7位关联关系，认为前7位下的手机号属于同一区域同一伙人</li>
+                                <li><strong>IP</strong>：和设备相类似的资源聚集策略。增加IPC段关联关系，认为同一IPC下的IP都属于同一区域同一伙人的IP</li>
+                            </ul>
+
+                            <h5>群控机器注册</h5>
+                            <ul>
+                                <li><strong>流量异常拦截</strong>：某一设备型号、设备系统版本号、老旧型号设备短期内大量请求注册事件</li>
+                                <li><strong>自动化点击拦截</strong>：设备开启自动化、站内埋点行为异常（时间间隔太短、用户行为序列聚集）</li>
+                                <li><strong>老旧型号、便宜设备大量注册拦截</strong>：针对特定型号设备的大量注册行为进行拦截</li>
+                            </ul>
+
+                            <h5>虚假实体</h5>
+                            <ul>
+                                <li><strong>设备</strong>：PC模拟器、手机模拟器、云手机、多开、虚拟空间等</li>
+                                <li><strong>IP</strong>：代理IP、机房IP</li>
+                                <li><strong>手机号</strong>：虚拟运营商手机号、物联网手机号、接码平台手机号、猫池手机号</li>
+                            </ul>
+                        </section>
+
+                        <!-- 2.2 养号扫号 -->
+                        <section id="account-farming" class="doc-subsection">
+                            <h3>2.2 养号扫号</h3>
+                            <p>养号扫号是指黑产通过自动化工具或人工方式，批量创建并维护大量账号，用于后续的恶意行为。检测方法包括：</p>
+                            <ul>
+                                <li>行为模式分析：识别异常的登录、活动模式</li>
+                                <li>设备关联分析：检测同一设备关联的账号数量</li>
+                                <li>IP行为分析：识别异常IP地址的访问模式</li>
+                                <li>时间序列分析：检测账号创建和使用的时序特征</li>
+                            </ul>
+                        </section>
+
+                        <!-- 2.3 人机对抗 -->
+                        <section id="human-machine" class="doc-subsection">
+                            <h3>2.3 人机对抗</h3>
+                            <p>人机对抗技术用于区分人类用户和自动化程序，主要包括：</p>
+                            <ul>
+                                <li>验证码技术：图像识别、文字识别、滑块验证等</li>
+                                <li>行为分析：鼠标移动轨迹、点击模式、键盘输入特征等</li>
+                                <li>设备指纹：识别设备唯一性，防止多账号操作</li>
+                                <li>环境检测：检测浏览器环境、应用运行环境等</li>
+                            </ul>
+                        </section>
+                    </section>
+
+                    <!-- 3. 设备层 -->
+                    <section id="device-layer" class="doc-section">
+                        <h2>3. 设备层</h2>
+
+                        <!-- 3.1 虚假设备 -->
+                        <section id="fake-device" class="doc-subsection">
+                            <h3>3.1 虚假设备</h3>
+
+                            <h4>PC模拟器检测</h4>
+                            <p>通过CPU架构、文件特征等方式检测PC模拟器：</p>
+
+                            <h5>CPU架构检测</h5>
+                            <p>绝大部分手机CPU框架都是ARM，而电脑PC则是x86：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Assembly</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-assembly">section .data
+section .text
+global _start
+
+_start:
+    mov eax, 0       ; 将要修改的值初始化为0
+    mov dword [current_address], eax  ; 将eax的值存储到current_address地址中
+    mov ebx, dword [current_address]  ; 从current_address地址中加载数据到寄存器ebx中
+    cmp ebx, eax     ; 比较加载的数据和初始值
+    je x86_detected  ; 如果相等，表示是x86架构，跳转到x86_detected标签
+    mov edx, 1       ; 如果不相等，表示不是x86架构，将结果存储在寄存器edx中
+    jmp end          ; 跳转到end标签
+
+x86_detected:
+    mov edx, 0       ; 如果相等，表示是x86架构，将结果存储在寄存器edx中
+
+end:
+    ; 在这里可以根据edx的值进行后续操作
+
+current_address:
+    dd 0x12345678    ; 要修改的指令</code></pre>
+                            </div>
+
+                            <h5>文件特征检测</h5>
+                            <p>通过扫描文件目录，查看是否有模拟器相关的特征：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">// 检测挂载目录
+String[] emulatorPaths = {
+    "/mnt/shared/Sharefolder",
+    "/tiantian.conf",
+    "/data/share1",
+    "/hardware_device.conf",
+    "/mnt/shared/products",
+    "/mumu_hardware.conf",
+    "/Andy.conf",
+    "/mnt/windows/BstSharedFolder",
+    "/bst.conf",
+    "/mnt/shared/Applications",
+    "/ld.conf"
+};
+
+for (String path : emulatorPaths) {
+    File file = new File(path);
+    if (file.exists()) {
+        // 检测到模拟器
+        return true;
+    }
+}</code></pre>
+                            </div>
+
+                            <h4>云手机检测</h4>
+                            <p>市面上的云手机主要是安卓系统：</p>
+                            <ul>
+                                <li><strong>IP特性</strong>：IP是否为机房IP，通过IP归属运营商信息判断</li>
+                                <li><strong>硬件特性</strong>：传感器的数量、传感器供应商名中AOSP的占比</li>
+                                <li><strong>文件特征</strong>：挂载目录下是否包含docker关键词</li>
+                            </ul>
+
+                            <h4>多开/虚拟空间检测</h4>
+                            <p>通过ROM包检测、多开特征名等方式识别多开环境：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">private static String isDualFromMaps() {
+    String ret = "nothing";
+    String path = "/proc/" + "self" + "/maps";
+    File fileTmp = new File(path);
+    if (!fileTmp.exists() || !fileTmp.isFile()) {
+        return ret;
+    }
+
+    String multiboxMatch = ".*dkplat.*|.*duokai.*|.*fenshen.*|.*shuangkai.*|.*iolang.*|.*dualaid.*|.*masaid.*|.*com.excean.*|.*qihoo.magic.*|.*droi.adocker.*" +
+            "|.*多开.*|.*分身.*|.*双开.*|.*炼妖壶.*|.*隐身空间.*|.*wxfs.*|.*dktool.*|.*fstool.*|.*dkapp.*|.*da.nui.*|.*dkplugin.*" +
+            "|.*xmatser.*|.*虚拟大师.*|.*wxmult.*|.*red.virtual.*|.*限制微信登录.*|.*平行空间.*";
+
+    try (BufferedReader br = new BufferedReader(new FileReader(fileTmp))) {
+        String line;
+        while ((line = br.readLine()) != null) {
+            if (line.matches(multiboxMatch)) {
+                return line;
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return ret;
+}</code></pre>
+                            </div>
+                        </section>
+
+                        <!-- 3.2 群控-自动化工具 -->
+                        <section id="automation-tools" class="doc-subsection">
+                            <h3>3.2 群控-自动化工具</h3>
+
+                            <h4>AI判断设备输入事件轨迹</h4>
+                            <p>通过adb命令getevent监测和分析设备上的输入事件：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class UserBehaviorTracker {
+    public static void main(String[] args) {
+        // 监控近5秒内的行为轨迹
+        String behaviorTrace = getBehaviorTrace(5000);
+        String cleanedTrace = cleanBehaviorTrace(behaviorTrace);
+        System.out.println("用户行为轨迹：" + cleanedTrace);
+    }
+
+    public static String getBehaviorTrace(long duration) {
+        StringBuilder traceBuilder = new StringBuilder();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + duration;
+
+        try {
+            Process process = Runtime.getRuntime().exec("adb shell getevent -lt /dev/input/eventX");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // 检查时间戳是否在指定的时间范围内
+                if (System.currentTimeMillis() > endTime) {
+                    break;
+                }
+
+                // 将行为轨迹添加到字符串构建器中
+                traceBuilder.append(line).append("\n");
+            }
+
+            reader.close();
+            process.destroy();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return traceBuilder.toString();
+    }
+
+    public static String cleanBehaviorTrace(String behaviorTrace) {
+        StringBuilder cleanedTraceBuilder = new StringBuilder();
+
+        String[] lines = behaviorTrace.split("\n");
+        for (String line : lines) {
+            if (line.contains("EV_ABS       ABS_MT_POSITION_X") || line.contains("EV_ABS       ABS_MT_POSITION_Y")) {
+                cleanedTraceBuilder.append(line).append("\n");
+            }
+        }
+
+        return cleanedTraceBuilder.toString();
+    }
+}</code></pre>
+                            </div>
+
+                            <h4>自动化工具识别</h4>
+                            <ul>
+                                <li>通过辅助服务列表，判断是否包含autojs、stardust、autoclick等关键词</li>
+                                <li>通过辅助服务抛异常来判断当前点击是否是辅助服务点的</li>
+                            </ul>
+
+                            <h4>设备农场检测</h4>
+                            <p>通过群控设备之间的关联聚集关系，结合实际业务行为判断：</p>
+                            <ul>
+                                <li><strong>关系网络构建</strong>：通过强介质（IP、IPC段、手机号、手机号前缀7位、用户ID、设备ID）构建网络关系，圈出团伙</li>
+                                <li><strong>共有风险判断</strong>：
+                                    <ul>
+                                        <li>共有设备风险：近期重置、老旧型号设备、廉价设备、硬盘空间使用率低、ROOT状态、模拟器、VPN使用、USB状态等</li>
+                                        <li>共有行为风险：共同的行为集、行为时间间隔相似、昵称或内容文本相似、活跃特征相似</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <h4>ROOT检测</h4>
+                            <p>通过包名检测、su文件检测、Magisk相关文件检测等方式识别ROOT设备：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class LsposedChecker {
+    public static boolean isLsposedInstalled() {
+        try {
+            Process process = Runtime.getRuntime().exec("cat /proc/self/maps");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                // 通过检测map表是否存在匿名的并且具有可执行属性的内存判断是否存在lsposed
+                if (line.contains(" [anon:") && line.contains("x")) {
+                    return true;
+                }
+                // 检测栈空间[stack]的权限是否为"rw-p"
+                if (line.contains("[stack]") && line.contains("rw-p")) {
+                    return true;
+                }
+                // 加载zygisk模块时（也就是liblspd.so)的时候会讲其名称设置为jit-cache，这样的话so的内存段在maps中就是/memfd:/jit-cache）
+                if (line.contains("/memfd:/jit-cache")) {
+                    return true;
+                }
+            }
+            reader.close();
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}</code></pre>
+                            </div>
+                        </section>
+
+                        <!-- 3.3 设备伪造 -->
+                        <section id="device-forgery" class="doc-subsection">
+                            <h3>3.3 设备伪造</h3>
+                            <p>判断设备是否伪造，主要原理是被伪造的设备型号有一些特定的文件特征，是伪造应用难以仿制的。</p>
+
+                            <h4>ROM包fingerprint</h4>
+                            <p>每个系统包都对应一串指纹，即ROM包的md5值：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">C</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-c">char* getFilesDesc(){
+    const char* p1 = "/data/system";
+    const char* p1Md5 = getFilesInfo(p1, "db", 0);
+
+    const char* p2 = "/vendor/firmware";
+    const char* p2Md5 = getFilesInfo(p2, NULL, 0);
+
+    const char* p3 = "/system/bin";
+    const char* p3Md5 = getFilesInfo(p3, NULL, 0);
+
+    const char* p4 = "/vendor/lib";
+    const char* p4Md5 = getFilesInfo(p4, NULL, 0);
+
+    const char* p5 = "/system/framework";
+    const char* p5Md5 = getFilesInfo(p5, NULL, 0);
+
+    // 计算所需的缓冲区大小
+    size_t bufferSize = 250;
+
+    // 分配足够大小的缓冲区
+    char* result = (char*)malloc(bufferSize * sizeof(char));
+    if (result == NULL) {
+        return NULL;
+    }
+
+    // 将路径和对应的MD5值按照键值对的形式添加到缓冲区中
+    snprintf(result, bufferSize, "ds:%s;vf:%s;sb:%s;vl:%s;sf:%s",
+             p1Md5, p2Md5, p3Md5, p4Md5, p5Md5);
+    return result;
+}</code></pre>
+                            </div>
+
+                            <h4>关键系统函数地址</h4>
+                            <p>获取dlsym、stat、getuid等关键函数在内存中的地址：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">C</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-c">char* getSysCode(){
+    // 函数指针类型
+    typedef void* (*FuncPtr)();
+
+    // 结构体，用于存储函数指针和名称
+    typedef struct {
+        FuncPtr ptr;
+        const char* name;
+    } FuncInfo;
+
+    // 定义函数指针和名称的数组
+    typedef int (*open_func)(const char *, int, ...);
+    open_func func_open = (open_func)&open;
+    FuncInfo funcs[] = {
+        {(FuncPtr)dlsym, "f1"},
+        {(FuncPtr)dlopen, "f2"},
+        {(FuncPtr)func_open, "f3"},
+        {(FuncPtr)stat, "f4"},
+        {(FuncPtr)fopen, "f5"},
+        {(FuncPtr)getuid, "f6"}
+    };
+
+    char callCode[256] = {0};
+    char temp[20] = {0};
+    char* result = (char*)malloc(6 * 256 * sizeof(char));
+    int totalLen = 0;
+
+    // 遍历函数数组
+    for (int i = 0; i < sizeof(funcs) / sizeof(funcs[0]); i++) {
+        int len = obtainSyscallCode(funcs[i].ptr, callCode, 256);
+
+        // 如果调用代码的长度大于0，则将方法和调用代码拼接到结果字符串中
+        if (len > 0) {
+            // 拼接方法名、调用代码长度和调用代码本身到结果字符串中
+            int resultLen = snprintf(result + totalLen, 6 * 256 - totalLen, "%s:%s;", funcs[i].name, callCode);
+            // 更新总长度
+            totalLen += resultLen;
+            // 如果长度超过了可用空间，跳出循环
+            if (totalLen >= 6 * 256) {
+                break;
+            }
+        }
+    }
+    return result;
+}</code></pre>
+                            </div>
+
+                            <h4>伪造工具相关文件特征</h4>
+                            <p>检测伪造工具相关的文件和目录：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">import java.io.File;
+
+public class FileChecker {
+    public static boolean isFilesExist() {
+        String directoryPath = "/data/local/tmp/";
+        String[] fileNames = {"shizuku", "shizuku_starter"};
+
+        for (String fileName : fileNames) {
+            File file = new File(directoryPath, fileName);
+            if (!file.exists()) {
+                return false;
+            }
+        }
+        return true;
+    }
+}</code></pre>
+                            </div>
+                        </section>
+
+                        <!-- 3.4 恶意注入/篡改 -->
+                        <section id="malicious-injection" class="doc-subsection">
+                            <h3>3.4 恶意注入/篡改</h3>
+
+                            <h4>Android Frida检测</h4>
+                            <p>检测Frida特征：进程/proc/self/fd/目录，寻找是否存在关键字linjector：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">C</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-c">#define MAX_LENGTH 256
+static const char *FRIDA_THREAD_GUM_JS_LOOP = "gum-js-loop";
+static const char *FRIDA_THREAD_GMAIN = "gmain";
+static const char *FRIDA_NAMEDPIPE_LINJECTOR = "linjector";
+static const char *PROC_MAPS = "/proc/self/maps";
+static const char *PROC_STATUS = "/proc/self/task/%s/status";
+static const char *PROC_FD = "/proc/self/fd";
+static const char *PROC_TASK = "/proc/self/task";
+
+static inline bool detect_frida_threads() {
+    DIR *dir = opendir(PROC_TASK);
+
+    if (dir != NULL) {
+        struct dirent *entry = NULL;
+        while ((entry = readdir(dir)) != NULL) {
+            char filePath[MAX_LENGTH] = "";
+
+            if (0 == strcmp(entry->d_name, ".") || 0 == strcmp(entry->d_name, "..")) {
+                continue;
+            }
+            snprintf(filePath, sizeof(filePath), PROC_STATUS, entry->d_name);
+
+            int fd = openat(AT_FDCWD, filePath, O_RDONLY | O_CLOEXEC, 0);
+            if (fd != 0) {
+                char buf[MAX_LENGTH] = "";
+                read_one_line(fd, buf, MAX_LENGTH);
+                if (strstr(buf, FRIDA_THREAD_GUM_JS_LOOP) ||
+                    strstr(buf, FRIDA_THREAD_GMAIN)) {
+                    return true;
+                }
+                close(fd);
+            }
+        }
+        closedir(dir);
+    }
+    return false;
+}</code></pre>
+                            </div>
+
+                            <h4>Android Xposed检测</h4>
+                            <p>通过目录/文件检测、ClassLoader检测、缓存检测等方式识别Xposed框架：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">private Map<String, Object> checkClassLoader() {
+    String keyword = "XposedBridge.jar";
+    Map<String, Object> result = new HashMap<String, Object>();
+    ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+    Object tmp = StringUtils.hasRelatedClass(systemClassLoader, keyword);
+    if (tmp != null && tmp != "") {
+        result.put("systemClassLoader", tmp);
+    }
+    tmp = StringUtils.hasRelatedClass(systemClassLoader.getParent(), keyword);
+    if (tmp != null && tmp != "") {
+        result.put("systemClassLoader-getParent", tmp);
+    }
+    tmp = StringUtils.hasRelatedClass(getClass().getClassLoader(), keyword);
+    if (tmp != null && tmp != "") {
+        result.put("getClass-getClassLoader", tmp);
+    }
+    tmp = StringUtils.hasRelatedClass(getClass().getClassLoader().getParent(), keyword);
+    if (tmp != null && tmp != "") {
+        result.put("getClass-getClassLoader-getParent", tmp);
+    }
+    return result;
+}</code></pre>
+                            </div>
+
+                            <h4>Android libc的CRC检测</h4>
+                            <p>通过CRC校验验证libc.so文件中关键段的完整性：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.zip.CRC32;
+
+public class LibcCRCChecker {
+    public static boolean isLibcIntegrityValid() {
+        try {
+            // 读取 /proc/self/maps 文件
+            BufferedReader reader = new BufferedReader(new FileReader("/proc/self/maps"));
+            String line;
+            String libcBaseAddress = null;
+
+            // 在映射信息中找到 libc.so 的基地址
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("libc.so")) {
+                    String[] segments = line.split(" ");
+                    libcBaseAddress = segments[0].split("-")[0];
+                    break;
+                }
+            }
+
+            reader.close();
+
+            if (libcBaseAddress != null) {
+                // 计算 .text、.rodata、.eh_frame 和 .eh_frame_hdr 这几个段的 CRC 校验值
+                long textCRC = calculateSegmentCRC(libcBaseAddress, ".text");
+                long rodataCRC = calculateSegmentCRC(libcBaseAddress, ".rodata");
+                long ehFrameCRC = calculateSegmentCRC(libcBaseAddress, ".eh_frame");
+                long ehFrameHdrCRC = calculateSegmentCRC(libcBaseAddress, ".eh_frame_hdr");
+
+                // 比较计算得到的 CRC 校验值与预期值
+                long expectedTextCRC = 0x12345678; // 替换为实际的预期 CRC 校验值
+                long expectedRodataCRC = 0x87654321; // 替换为实际的预期 CRC 校验值
+                long expectedEhFrameCRC = 0xabcdef01; // 替换为实际的预期 CRC 校验值
+                long expectedEhFrameHdrCRC = 0x01efcdab; // 替换为实际的预期 CRC 校验值
+
+                return textCRC == expectedTextCRC && rodataCRC == expectedRodataCRC &&
+                        ehFrameCRC == expectedEhFrameCRC && ehFrameHdrCRC == expectedEhFrameHdrCRC;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private static long calculateSegmentCRC(String baseAddress, String segmentName) throws IOException {
+        // 读取对应段的内容
+        String segmentFilePath = String.format("/proc/self/mem/%s-%s", baseAddress, segmentName);
+        ByteBuffer buffer = ByteBuffer.allocate(4096);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+        try (FileReader fileReader = new FileReader(segmentFilePath)) {
+            fileReader.skip(0x1000); // 跳过 ELF 头部
+            fileReader.read(buffer.array());
+        }
+
+        // 计算 CRC 校验值
+        CRC32 crc32 = new CRC32();
+        crc32.update(buffer.array());
+        return crc32.getValue();
+    }
+}</code></pre>
+                            </div>
+
+                            <h4>IOS注入检测</h4>
+                            <p>通过dyld检测、inline hook检测等方式识别IOS注入：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Objective-C</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-objectivec">// 检测hook信息
+- (NSString*) getHookInfo {
+    NSArray *suspiciousLibraries = @[@"dobby", @"frida", @"cynject", @"libcycript", @"hook"];
+    // 目前已经加载的dyld
+    uint32_t count = _dyld_image_count();
+    for (uint32_t i = 0; i < count; i++) {
+        const char *dyld = _dyld_get_image_name(i);
+        NSString *dyldStr = [[NSString alloc] initWithCString:dyld encoding:NSUTF8StringEncoding];
+        for (NSString *suspiciousLibrary in suspiciousLibraries) {
+            if ([dyldStr.lowercaseString containsString:suspiciousLibrary]) {
+                return suspiciousLibrary;
+            }
+        }
+    }
+
+    NSString *name = @"/usr/sbin/frida-server";
+    if ([[NSFileManager defaultManager] fileExistsAtPath:name]) {
+        return name;
+    }
+
+    return @"";
+}</code></pre>
+                            </div>
+                        </section>
+
+                        <!-- 3.5 环境检测 -->
+                        <section id="environment-detection" class="doc-subsection">
+                            <h3>3.5 环境检测</h3>
+
+                            <h4>VPN检测</h4>
+                            <p>通过遍历设备的接口信息，判断网卡状态和名称：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">C</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-c">char* detect_vpn_connected() {
+    int fd, intrface;
+    struct ifreq buf[MAXINTERFACES];
+    struct ifconf ifc;
+
+    if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) >= 0) {
+        ifc.ifc_len = sizeof(buf);
+        ifc.ifc_buf = (caddr_t)buf;
+        if (!ioctl(fd, SIOCGIFCONF, &ifc)) {
+            // 获取接口信息
+            intrface = ifc.ifc_len / sizeof(struct ifreq);
+            while (intrface-- > 0) {
+                if (-1 == ioctl(fd, SIOCGIFFLAGS, &buf[intrface])) {
+                    close(fd);
+                    return "";
+                }
+                // 判断网卡状态
+                if (buf[intrface].ifr_flags & IFF_UP) {
+                    const char* tun = "tun";
+                    if (0 == strncmp(buf[intrface].ifr_name, tun, 3)
+                        || 0 == strncmp(buf[intrface].ifr_name, "ppp", 3)) {
+                        close(fd);
+                        return "intrface-3";
+                    }
+                }
+            }
+        }
+    }
+    close(fd);
+    return "";
+}</code></pre>
+                            </div>
+
+                            <h4>USB状态检测</h4>
+                            <p>检测设备的USB状态，包括充电、adb调试、多媒体迁移模式等。</p>
+
+                            <h4>SIM卡状态检测</h4>
+                            <p>检测SIM卡状态，包括缺失、准备好、未知等。</p>
+
+                            <h4>调试模式检测</h4>
+                            <p>检测设备是否开启调试模式：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">// 获取设备是否开启调试模式
+private static int getDebuggable() {
+    try {
+        PackageManager packageManager = CollectConfig.mContext.getPackageManager();
+        ApplicationInfo applicationInfo = CollectConfig.mContext.getApplicationInfo();
+        PackageInfo packageInfo = packageManager.getPackageInfo(applicationInfo.packageName, 0);
+        boolean b = (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        if (b) {
+            return 1;
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return 0;
+}</code></pre>
+                            </div>
+                        </section>
+
+                        <!-- 3.6 设备指纹 -->
+                        <section id="device-fingerprint" class="doc-subsection">
+                            <h3>3.6 设备指纹</h3>
+
+                            <h4>唯一性采集 - Android</h4>
+                            <p>通过多种方式采集设备唯一标识：</p>
+
+                            <h5>UUID</h5>
+                            <p>通用唯一识别码，保证在同一时空中的所有机器都是唯一的：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">import java.util.UUID;
+
+public class DeviceUtils {
+    public static String getDeviceUUID() {
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString();
+    }
+}</code></pre>
+                            </div>
+
+                            <h5>DRM ID</h5>
+                            <p>数字版权管理ID，通过MediaDrm对象获取设备唯一ID：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">import android.media.MediaDrm;
+import java.util.UUID;
+
+public class DRMUtils {
+    public static String getDeviceUniqueID() {
+        UUID wideVineUuid = new UUID(-0x121074568629b532L, -0x5c37d8232ae2de13L);
+        MediaDrm wvDrm = new MediaDrm(wideVineUuid);
+        byte[] deviceUniqueId = wvDrm.getPropertyByteArray(MediaDrm.PROPERTY_DEVICE_UNIQUE_ID);
+        wvDrm.close();
+
+        return bytesToHexString(deviceUniqueId);
+    }
+
+    private static String bytesToHexString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+}</code></pre>
+                            </div>
+
+                            <h5>硬件ID拼接</h5>
+                            <p>将多个可获得的硬件标识拼接起来生成设备唯一ID：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">// 硬件ID拼接
+String hardwareId = Build.BOARD.length() % 10 + Build.BRAND.length() % 10 +
+        Build.DEVICE.length() % 10 + Build.USER.length() % 10 +
+        Build.DISPLAY.length() % 10 + Build.HOST.length() % 10 +
+        Build.ID.length() % 10 + Build.MANUFACTURER.length() % 10 +
+        Build.MODEL.length() % 10 + Build.PRODUCT.length() % 10 +
+        Build.HARDWARE.length() % 10 + Build.FINGERPRINT.length() % 10 +
+        Build.VERSION.INCREMENTAL.length() % 10 + Build.getRadioVersion().length() % 10 +
+        Build.TIME % 10;   // 15位</code></pre>
+                            </div>
+
+                            <h5>IMEI</h5>
+                            <p>国际移动设备识别码，用于在移动电话网络中识别每一部独立的手机：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Java</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-java">import android.content.Context;
+import android.os.Build;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+
+import java.lang.reflect.Method;
+
+public class IMEIUtils {
+    public static String getImeiNew(Context context) {
+        String imei = null;
+
+        try {
+            if (context != null) {
+                TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                if (telephonyManager != null && checkPermission(context, "android.permission.READ_PHONE_STATE")) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        try {
+                            Method method = telephonyManager.getClass().getMethod("getImei");
+                            method.setAccessible(true);
+                            imei = (String) method.invoke(telephonyManager);
+                        } catch (Exception e) {
+                            // Ignore
+                        }
+
+                        if (TextUtils.isEmpty(imei)) {
+                            imei = telephonyManager.getDeviceId();
+                        }
+                    } else {
+                        imei = telephonyManager.getDeviceId();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Handle exception
+        }
+
+        return imei;
+    }
+
+    private static boolean checkPermission(Context context, String permission) {
+        int result = context.checkCallingOrSelfPermission(permission);
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
+}</code></pre>
+                            </div>
+
+                            <h4>唯一性采集 - IOS</h4>
+                            <p>通过关键函数地址等方式采集IOS设备唯一标识：</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">Objective-C</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-objectivec">// 获取关键函数地址
+- (NSMutableDictionary*) getFuncAddr:(void *)func {
+    Dl_info info;
+    NSMutableDictionary *funcAddr = [NSMutableDictionary dictionary];
+    if (dladdr(func, &info)) {
+        [funcAddr setObject:[NSString stringWithFormat:@"%s", info.dli_fname] forKey:@"fname"];
+        [funcAddr setObject:[NSString stringWithFormat:@"%s", info.dli_sname] forKey:@"sname"];
+        [funcAddr setObject:[NSString stringWithFormat:@"%p", info.dli_fbase] forKey:@"fbase"];
+        [funcAddr setObject:[NSString stringWithFormat:@"%p", info.dli_saddr] forKey:@"saddr"];
+    }
+    return funcAddr;
+}</code></pre>
+                            </div>
+
+                            <h4>设备指纹算法</h4>
+
+                            <h5>字符串拼接MD5</h5>
+                            <p>将采集的唯一性特征按照特定方式拼接，通过魔改后的MD5算法生成设备指纹。</p>
+
+                            <h5>SimHash</h5>
+                            <p>使用SimHash算法生成设备指纹，具有较好的容错性和稳定性。</p>
+
+                            <div class="note-box">
+                            <strong>参考:</strong> https://sirijr.github.io/account-security-work.html
+                            </div>
+
+                            <div class="note-box">
+                                <strong>优化方案:</strong> 引入"拜占庭容错"方案，采集三个设备ID到服务器端，如果有两个（包括两个以上）的设备ID和之前的记录相同，则认为是同一台设备。
+                            </div>
+                        </section>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 返回顶部按钮 -->
+    <a href="#" class="back-to-top">
+        <i class="bi bi-arrow-up"></i>
+    </a>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h5>风控内容安全技术文档</h5>
+                    <p>分享最前沿的内容安全技术与实践</p>
+                </div>
+                <div class="col-lg-6 text-lg-end">
+                    <p>© 2025 风控技术团队. 保留所有权利.</p>
+                    <p>
+                        <a href="#" class="text-white me-2"><i class="bi bi-github"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-envelope"></i></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        // 初始化代码高亮
+        hljs.highlightAll();
+
+        // 返回顶部按钮功能
+        const backToTop = document.querySelector('.back-to-top');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+
+        // 代码复制功能
+        document.querySelectorAll('.code-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const codeBlock = this.closest('.code-block');
+                const code = codeBlock.querySelector('code').innerText;
+
+                // 复制到剪贴板
+                navigator.clipboard.writeText(code)
+                    .then(() => {
+                        // 显示复制成功反馈
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<i class="bi bi-check"></i> 已复制';
+                        this.classList.add('copied');
+
+                        // 2秒后恢复原始状态
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                            this.classList.remove('copied');
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('复制失败:', err);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
