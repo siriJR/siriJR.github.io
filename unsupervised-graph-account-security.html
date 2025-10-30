@@ -425,46 +425,54 @@
 
                             <p>首先，我们先初始化每个特征节点的权重：</p>
 
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <span class="code-lang">数学公式</span>
-                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                              <div class="image-container">
+
+                                <div class="image-container">
+                                   <img src="gongshi1.png" alt="用户节点与特征节点之间的关联关系">
+                                   <div class="image-caption">-</div>
                                 </div>
-                                <pre><code class="language-plaintext">w_x =
-  (ratio(x) + ratio(mode(pre(x)))) / 2, 如果 pre(x) ∈ pre_A
-  (1 - ratio(x) + 1 - ratio(mode(pre(x)))) / 2, 如果 pre(x) ∈ pre_B</code></pre>
+
                             </div>
 
                             <p>其中：</p>
                             <ul>
-                                <li><code>w_x</code>表示某个特征x的权重</li>
-                                <li><code>ratio(x)</code>表示这个特征值在这个特征组里的频率</li>
-                                <li><code>mode(pre(x))</code>表示特征节点下出现最多的类型</li>
-                                <li><code>pre_A</code>表示该特征属于A组（共有特征组）</li>
-                                <li><code>pre_B</code>表示该特征属于B组（私有特征组）</li>
+                                <li><code>wx</code>表示某个特征x的权重</li>
+                                <li><code>ratio(x)</code>表示这个特征值在这个特征组里的频率。举个例子，手机号1234456789，在所有1000次手机号记录当中，出现了10次，那么ratio(x)=10/1000</li>
+                                <li><code>mode(pre(x))</code>表示特征节点下出现最多的类型，比如设备系统版本，系统版本这个特征下有Android 7.0，Android 8.0，Android 9.0，占比分别为0.25，0.25，0.5，则最终我们得到 OSV 这个特征的特征模式为 Android 9.0。ratio(mode(pre(x)))表示Android 9.0的出现频率</li>
+                                <li><code>pre_A</code>表示该特征属于A组，也就是共有特征组，比如版本号、归属地、渠道来源等。</li>
+                                <li><code>pre_B</code>表示该特征属于B组，也就是私有特征组，比如IP、设备id等</li>
                             </ul>
 
                             <p>其次，我们根据特征节点权重，初始化用户节点的权重：</p>
 
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <span class="code-lang">数学公式</span>
-                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                             <div class="image-container">
+
+                                <div class="image-container">
+                                   <img src="gongshi2.png" alt="用户节点与特征节点之间的关联关系">
+                                   <div class="image-caption">-</div>
                                 </div>
-                                <pre><code class="language-plaintext">w_u = (1 / |N(u)|) * Σ_{x∈N(u)} w_x</code></pre>
+
                             </div>
 
-                            <p>其中<code>N(u)</code>表示用户u的邻居特征节点集合。</p>
+                            <p>其中<code></code>每个用户节点的初始特征即为其所有邻居特征节点的均值</p>
 
                             <h4>2.2.3 节点权重更新</h4>
-                            <p>对所有节点（用户+特征节点）的权重通过线性信念传播进行迭代更新。优化思路是基于每一次权重的迭代是对上一次节点权重的结果加上各邻居节点权重的平均影响，并且每次的权重仍保持在0-1之间。</p>
+                            <p>对所有节点(用户+特征节点)的权重通过线性信念传播（类似于Personalized PageRank）进行迭代更新。优化思路是基于每一次权重的迭代是对上一次节点权重的结果加上各邻居节点权重的平均影响，并且每次的权重在仍保持在0-1之间，由此得到如下的迭代公式，对比验证了优化后的公式在后续构造用户-用户同构图的过程中边关系更具稳定性</p>
+                              <div class="image-container">
 
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <span class="code-lang">数学公式</span>
-                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                <div class="image-container">
+                                   <img src="gongshi3.png" alt="用户节点与特征节点之间的关联关系">
+                                   <div class="image-caption">-</div>
                                 </div>
-                                <pre><code class="language-plaintext">w_v^(t+1) = 0.5 * (w_v^(t) + (0.5 + (1 / |N(v)|) * Σ_{u∈N(v)} (w_u^(t) - 0.5)))</code></pre>
+
+                            </div>
+                             <div class="image-container">
+
+                                <div class="image-container">
+                                   <img src="gongshi5.png" alt="用户节点与特征节点之间的关联关系">
+                                   <div class="image-caption">-</div>
+                                </div>
+
                             </div>
 
                             <p>对比验证了优化后的公式在后续构造用户-用户同构图的过程中边关系更具稳定性。</p>
@@ -473,16 +481,16 @@
                         <!-- 2.3 构建用户注册图 -->
                         <section id="user-registration-graph" class="doc-subsection">
                             <h3>2.3 构建用户注册图</h3>
-                            <p>在上述步骤中，我们完成了用户-特征节点之间的异构构图、以及每个节点权重（恶意概率）的初始化和更新，接下来为了挖掘异常用户团伙，我们需要把用户-特征异构图转成用户-用户同构图。</p>
+                            <p>在上述的步骤当中，我们完成了用户-特征节点之间的异构构图、以及每个节点权重（恶意概率）的初始化和更新，接下来为了挖掘异常用户团伙，我们需要把用户-特征异构图转成用户-用户同构图。
+当两个账户具有高度相似性时建立边。考虑到如果两个账号共享多个特征且这些特征拥有很大的权重，则这两个账号可能是虚假账号。因此，将相似度的定义为注册节点u，v之间共享的注册特征的权重之和</p>
 
-                            <p>当两个账户具有高度相似性时建立边。考虑到如果两个账号共享多个特征且这些特征拥有很大的权重，则这两个账号可能是虚假账号。因此，将相似度的定义为注册节点u，v之间共享的注册特征的权重之和：</p>
+                                  <div class="image-container">
 
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <span class="code-lang">数学公式</span>
-                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                <div class="image-container">
+                                   <img src="gongshi4.png" alt="用户节点与特征节点之间的关联关系">
+                                   <div class="image-caption">-</div>
                                 </div>
-                                <pre><code class="language-plaintext">sim(u,v) = Σ_{x∈N(u)∩N(v)} w_x</code></pre>
+
                             </div>
 
                             <p>两个用户节点相似度为公共的特征节点的权重之和，即若上述相似度大于设定的阈值（相似度阈值），则两个用户节点连上边。这时若只考虑用户节点和用户节点之间的边，即成为了一个同构的用户图。</p>
@@ -629,7 +637,7 @@
                         <h2>4. 后续计划</h2>
 
                         <div class="image-container">
-                            <img src="ungraph5-account-security.png.png" alt="实时/离线">
+                            <img src="ungraph5-account-security.png" alt="实时/离线">
                             <div class="image-caption">图5: 实时/离线</div>
                         </div>
 
