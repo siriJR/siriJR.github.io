@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区挖掘：基于注册图网络的恶意账户聚集检测模型 | 风控技术文档</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            padding-top: 4rem;
+            background-color: #f8f9fa;
+        }
+
+        .doc-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .doc-toc {
+            position: sticky;
+            top: 2rem;
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .doc-content {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .doc-section {
+            margin-bottom: 3rem;
+        }
+
+        .doc-section h2 {
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .doc-section h3 {
+            color: var(--secondary-color);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .code-block {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .code-lang {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+        }
+
+        .code-copy {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .code-copy:hover {
+            color: var(--secondary-color);
+        }
+
+        .code-copy.copied {
+            color: var(--accent-color);
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .image-caption {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        .note-box {
+            background-color: #e8f4f8;
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background-color: #fef3e2;
+            border-left: 4px solid var(--accent-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+        }
+
+        .performance-table {
+            font-size: 0.9rem;
+        }
+
+        .performance-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .nav-breadcrumb {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .algorithm-overview {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .algorithm-step {
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .algorithm-step h5 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-table {
+            font-size: 0.85rem;
+        }
+
+        .result-table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .doc-toc {
+                position: static;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="content-security-work.html">
+                <i class="bi bi-arrow-left me-2"></i>返回工作记录
+            </a>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="nav-breadcrumb">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="index.html">首页</a></li>
+                    <li class="breadcrumb-item"><a href="content-security-work.html">风控工作记录</a></li>
+                    <li class="breadcrumb-item active">社区挖掘算法</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 文档头部 -->
+    <header class="doc-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <span class="badge bg-light text-dark mb-2">算法文档</span>
+                    <h1 class="display-5 fw-bold">社区挖掘：基于注册图网络的恶意账户聚集检测模型</h1>
+                    <p class="lead">使用图网络技术识别和检测恶意账户聚集行为</p>
+                    <div class="d-flex flex-wrap mt-3">
+                        <span class="tag">社区挖掘</span>
+                        <span class="tag">图网络</span>
+                        <span class="tag">恶意账户检测</span>
+                        <span class="tag">无监督学习</span>
+                        <span class="tag">黑产对抗</span>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <div class="text-white-50">
+                        <p><i class="bi bi-calendar me-2"></i>发布日期: 2025年10月30日</p>
+                        <p><i class="bi bi-person me-2"></i>作者: siriJR</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="row">
+            <!-- 文档目录 -->
+            <div class="col-lg-3">
+                <div class="doc-toc">
+                    <h5>文档目录</h5>
+                    <nav id="table-of-contents">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#background">1. 背景</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#algorithm-intro">2. 算法过程简介</a>
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#feature-extraction">2.1 特征提取</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#unsupervised-weight">2.2 无监督权重学习</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#user-registration-graph">2.3 构建用户注册图</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#malicious-detection">2.4 恶意账号检测</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#real-time-detection">2.5 实时检测</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#actual-results">3. 实际效果验证</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#future-plan">4. 后续计划</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#appendix">附录</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- 文档内容 -->
+            <div class="col-lg-9">
+                <div class="doc-content">
+                    <!-- 摘要 -->
+                    <div class="alert alert-info">
+                        <h5><i class="bi bi-info-circle"></i> 摘要</h5>
+                        <p class="mb-0">本文详细介绍了一种基于注册图网络的恶意账户聚集检测模型。该模型通过构建用户-特征异构图，使用无监督权重学习方法计算节点异常概率，并将异构图转换为用户-用户同构图，最终通过社区发现算法识别恶意账户聚集团伙。实验结果表明，该方法能有效识别各类黑产行为，包括刷人气、广告导流、活动薅羊毛等。</p>
+                    </div>
+
+                    <!-- 1. 背景 -->
+                    <section id="background" class="doc-section">
+                        <h2>1. 背景</h2>
+                        <p>在风控领域，识别和防范恶意账户是保护平台安全的重要任务。传统的单账户检测方法往往难以应对组织化、规模化的黑产团伙。黑产团伙通常具有相似的注册特征和行为模式，通过图网络技术可以发现这些隐藏的关联关系，从而更有效地识别恶意账户聚集。</p>
+
+                        <p>本文提出的社区挖掘算法旨在通过分析用户注册阶段的各种特征，构建用户-特征异构图，利用无监督学习方法计算节点权重，最终识别出具有相似特征的恶意账户团伙。</p>
+
+                        <div class="note-box">
+                            <strong>参考资源:</strong>
+                            <ul>
+                                <li><a href="https://zhuanlan.zhihu.com/p/442510415" target="_blank">图神经网络在风控中的应用</a></li>
+                                <li><a href="https://www.51cto.com/article/756887.html" target="_blank">基于图计算的恶意账户检测</a></li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- 2. 算法过程简介 -->
+                    <section id="algorithm-intro" class="doc-section">
+                        <h2>2. 算法过程简介</h2>
+
+                        <div class="algorithm-overview">
+                            <h5>算法整体流程</h5>
+                            <div class="algorithm-step">
+                                <h5>特征提取</h5>
+                                <p class="mb-0">从注册数据中提取共有特征和私有特征</p>
+                            </div>
+                            <div class="algorithm-step">
+                                <h5>无监督权重学习</h5>
+                                <p class="mb-0">构建异构图并计算节点权重，包括构图、初始化节点权重、更新节点权重</p>
+                            </div>
+                            <div class="algorithm-step">
+                                <h5>构建用户注册图</h5>
+                                <p class="mb-0">将异构图转换为用户-用户同构图</p>
+                            </div>
+                            <div class="algorithm-step">
+                                <h5>恶意账号检测</h5>
+                                <p class="mb-0">通过社区发现算法识别恶意账户团伙</p>
+                            </div>
+
+                            <div class="image-container">
+                                   <img src="ungraph-account-security.png" alt="总体流程图">
+                                   <div class="image-caption">图1: 包括特征提取、无监督权重学习、构建用户注册图、恶意账号检测（离线训练+实时推理）四部分</div>
+                            </div>
+                        </div>
+
+                        <!-- 2.1 特征提取 -->
+                        <section id="feature-extraction" class="doc-subsection">
+                            <h3>2.1 特征提取</h3>
+                            <p>特征可以划分为两类：共有特征和私有特征：</p>
+
+                            <h5>私有特征</h5>
+                            <p>设备id、IP、手机号、第三方did等，其下聚集用户越多表明越异常，越少则越正常。</p>
+
+                            <div class="image-container">
+                                   <img src="ungraph2-account-security.png" alt="用户节点与特征节点之间的关联关系">
+                                   <div class="image-caption">图2: 私有特征示意图</div>
+                            </div>
+
+                            <h5>共有特征</h5>
+                            <p>ip归属国家&省份&城市、版本号、渠道来源、用户设备系统版本、注册方式、注册时间、设备风险等，其下聚集的用户数越多表明越正常，越少则越异常。</p>
+
+                            <div class="note-box">
+                                <strong>注意:</strong> 不是所有的黑产都会逆向，因此共有特征的使用需要谨慎分析。
+                            </div>
+                        </section>
+
+                        <!-- 2.2 无监督权重学习 -->
+                        <section id="unsupervised-weight" class="doc-subsection">
+                            <h3>2.2 无监督权重学习</h3>
+                            <p>这部分包括构图、初始化节点权重、更新节点权重三部分。</p>
+
+                            <h4>2.2.1 构图（异构图）</h4>
+                            <p>注册阶段能拿到的信息都比较少，每条记录当中用户和特征都有关联关系，这里我们只构建用户--特征节点的关系，它们之间的边的权重都默认为1。</p>
+
+                            <div class="image-container">
+
+                                <div class="image-container">
+                                   <img src="ungraph3-account-security.png" alt="用户节点与特征节点之间的关联关系">
+                                   <div class="image-caption">图3: 用户-特征异构图</div>
+                                </div>
+
+                            </div>
+
+                            <p>例如用户1在注册时使用了IP 113.xxxxxxxxx、手机号186-xxxx-xxxx、设备版本号IOS 10.3.2，注册时间在9-12点之间。</p>
+
+                            <div class="note-box">
+                                <strong>注意:</strong> 这里只有用户-特征节点的关系，特征节点之间并没有构建关系。
+                            </div>
+
+                            <h4>2.2.2 节点权重初始化</h4>
+                            <p>在无监督权重学习中，我们的目标是学习每个提取特征和每个注册帐户的权重，权重量化异常，范围在0到1之间。较高的权重表示异常的可能性较大。</p>
+
+                            <p>首先，我们先初始化每个特征节点的权重：</p>
+
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">数学公式</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-plaintext">w_x =
+  (ratio(x) + ratio(mode(pre(x)))) / 2, 如果 pre(x) ∈ pre_A
+  (1 - ratio(x) + 1 - ratio(mode(pre(x)))) / 2, 如果 pre(x) ∈ pre_B</code></pre>
+                            </div>
+
+                            <p>其中：</p>
+                            <ul>
+                                <li><code>w_x</code>表示某个特征x的权重</li>
+                                <li><code>ratio(x)</code>表示这个特征值在这个特征组里的频率</li>
+                                <li><code>mode(pre(x))</code>表示特征节点下出现最多的类型</li>
+                                <li><code>pre_A</code>表示该特征属于A组（共有特征组）</li>
+                                <li><code>pre_B</code>表示该特征属于B组（私有特征组）</li>
+                            </ul>
+
+                            <p>其次，我们根据特征节点权重，初始化用户节点的权重：</p>
+
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">数学公式</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-plaintext">w_u = (1 / |N(u)|) * Σ_{x∈N(u)} w_x</code></pre>
+                            </div>
+
+                            <p>其中<code>N(u)</code>表示用户u的邻居特征节点集合。</p>
+
+                            <h4>2.2.3 节点权重更新</h4>
+                            <p>对所有节点（用户+特征节点）的权重通过线性信念传播进行迭代更新。优化思路是基于每一次权重的迭代是对上一次节点权重的结果加上各邻居节点权重的平均影响，并且每次的权重仍保持在0-1之间。</p>
+
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">数学公式</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-plaintext">w_v^(t+1) = 0.5 * (w_v^(t) + (0.5 + (1 / |N(v)|) * Σ_{u∈N(v)} (w_u^(t) - 0.5)))</code></pre>
+                            </div>
+
+                            <p>对比验证了优化后的公式在后续构造用户-用户同构图的过程中边关系更具稳定性。</p>
+                        </section>
+
+                        <!-- 2.3 构建用户注册图 -->
+                        <section id="user-registration-graph" class="doc-subsection">
+                            <h3>2.3 构建用户注册图</h3>
+                            <p>在上述步骤中，我们完成了用户-特征节点之间的异构构图、以及每个节点权重（恶意概率）的初始化和更新，接下来为了挖掘异常用户团伙，我们需要把用户-特征异构图转成用户-用户同构图。</p>
+
+                            <p>当两个账户具有高度相似性时建立边。考虑到如果两个账号共享多个特征且这些特征拥有很大的权重，则这两个账号可能是虚假账号。因此，将相似度的定义为注册节点u，v之间共享的注册特征的权重之和：</p>
+
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">数学公式</span>
+                                    <button class="code-copy"><i class="bi bi-clipboard"></i> 复制</button>
+                                </div>
+                                <pre><code class="language-plaintext">sim(u,v) = Σ_{x∈N(u)∩N(v)} w_x</code></pre>
+                            </div>
+
+                            <p>两个用户节点相似度为公共的特征节点的权重之和，即若上述相似度大于设定的阈值（相似度阈值），则两个用户节点连上边。这时若只考虑用户节点和用户节点之间的边，即成为了一个同构的用户图。</p>
+                        </section>
+
+                        <!-- 2.4 恶意账号检测 -->
+                        <section id="malicious-detection" class="doc-subsection">
+                            <h3>2.4 恶意账号检测</h3>
+                            <p>完成用户-用户同构图构图后，我们可以通过Louvain等算法挖掘社区团伙，但这里有个简单的方法，就是根据连通子图的用户数来判断，比如当子图的用户数大于某个阈值时，则认为该子图是一个恶意虚假团伙。</p>
+                        </section>
+
+                        <!-- 2.5 实时检测 -->
+                        <section id="real-time-detection" class="doc-subsection">
+                            <h3>2.5 实时检测</h3>
+                            <p>对于每天注册进来的新用户，如何高效迅速地识别注册用户是否是异常聚集的黑产用户呢？这里介绍商旅注册风控场景下的实时策略。</p>
+
+                            <p>首先，每注册一个新用户会触发模型的更新（模型的数据取近24~72小时的注册用户），同时每n分钟更新一次模型参数作为兜底。模型需要保存的参数一般有：坏用户节点、坏用户的所有特征节点及其权重、相似度阈值。</p>
+
+                            <div class="image-container">
+                                   <img src="ungraph4-account-security.png" alt="实时检测流程图">
+                                   <div class="image-caption">图4: 实时检测流程图</div>
+                            </div>
+
+                            <p>对于一个新注册用户，获取到其特征后，计算该用户与当前最新模型中的坏用户节点的相似度（即与坏用户特征节点的公共节点权重之和），若与任意一个坏用户节点的相似度大于模型的相似度阈值，则输出为异常聚集，否则认为是正常用户。</p>
+                        </section>
+                    </section>
+
+                    <!-- 3. 实际效果验证 -->
+                    <section id="actual-results" class="doc-section">
+                        <h2>3. 实际效果验证</h2>
+                        <p>本次试验，数据选取2024-06-01~2024-06-30号 注册时未被拦截的记录。</p>
+
+                        <ul>
+                            <li><strong>异构图</strong>：节点（用户+特征）共457,319个、边2,116,872条，边的权重都为1。</li>
+                            <li><strong>同构图</strong>：节点（用户）共111,404个、边34,283条，边的权重为用户之间的相似度（0-1之间）；连通子图共102319个，其中大于10个用户的团伙共27个。</li>
+                        </ul>
+
+                        <p>对筛选出的15个团伙验证如下（IOS团伙基本没明显风险，已剔除）：</p>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered result-table">
+                                <thead>
+                                    <tr>
+                                        <th>团伙序列</th>
+                                        <th>成员数</th>
+                                        <th>代表用户</th>
+                                        <th>风险描述</th>
+                                        <th>风险标签</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>289</td>
+                                        <td>123456789<br>123456789</td>
+                                        <td>行为：注册后不断重复【搜索->进房->搜索->进房】<br>设备风险：自动化工具、PC模拟器、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>刷人气、屯号养号</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>125</td>
+                                        <td>123456789<br>123456789</td>
+                                        <td>行为：注册后立马进入直播间，发送导流私信<br>设备风险：自动化工具、PC模拟器、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>广告导流</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>89</td>
+                                        <td>123456789<br>123456789<br>123456789</td>
+                                        <td>行为：注册后立马充值-->搜索-->私信<br>设备风险：自动化工具、PC模拟器、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>活动薅羊毛</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>24</td>
+                                        <td>123456789<br>123456789</td>
+                                        <td>行为：注册后【搜索->进房->搜索->进房】<br>设备风险：自动化工具、PC模拟器、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>屯号养号</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>20</td>
+                                        <td>123456789<br>123456789</td>
+                                        <td>行为：注册-->搜索-->评论-->搜索-->直播评论<br>设备风险：自动化工具、PC模拟器、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>广告导流</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>18</td>
+                                        <td>123456789</td>
+                                        <td>行为：注册后不断的进行搜索，搜索的内容都是数字，且不断的进行登录搜索<br>设备风险：老旧型号、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>屯号养号、恶意搜索</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td>18</td>
+                                        <td>123456789<br>123456789</td>
+                                        <td>行为：注册后立马充值-->搜索-->进房-->送礼-->参加活动<br>设备风险：自动化工具、开启辅助服务、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>活动薅羊毛</td>
+                                    </tr>
+                                    <tr>
+                                        <td>8</td>
+                                        <td>16</td>
+                                        <td>123456789<br>123456789</td>
+                                        <td>行为：注册后立马充值-->搜索-->进房-->送礼-->参加活动<br>设备风险：自动化工具、开启辅助服务、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>活动薅羊毛</td>
+                                    </tr>
+                                    <tr>
+                                        <td>9</td>
+                                        <td>16</td>
+                                        <td>123456789<br>123456789</td>
+                                        <td>行为：注册-->搜索-->评论-->搜索-->评论<br>设备风险：自动化工具、PC模拟器、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>广告导流</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>13</td>
+                                        <td>10</td>
+                                        <td>123456789<br>123456789</td>
+                                        <td>行为：注册后立马充值-->搜索-->进房-->送礼-->参加活动<br>设备风险：自动化工具、开启辅助服务、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>活动薅羊毛</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14</td>
+                                        <td>10</td>
+                                        <td>123456789<br>123456789</td>
+                                        <td>行为：注册后无活跃记录<br>设备风险：自动化工具、老旧型号、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>屯号养号</td>
+                                    </tr>
+                                    <tr>
+                                        <td>15</td>
+                                        <td>10</td>
+                                        <td>123456789<br>123456789</td>
+                                        <td>行为：注册后立马充值-->搜索-->进房-->送礼-->参加活动<br>设备风险：自动化工具、开启辅助服务、低活跃<br>地域风险：都来自同一城市</td>
+                                        <td>活动薅羊毛</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- 4. 后续计划 -->
+                    <section id="future-plan" class="doc-section">
+                        <h2>4. 后续计划</h2>
+
+                        <div class="image-container">
+                            <img src="ungraph5-account-security.png.png" alt="实时/离线">
+                            <div class="image-caption">图5: 实时/离线</div>
+                        </div>
+
+
+                        <h4>离线部分</h4>
+                        <ol>
+                            <li>每周获取近一个月注册数据</li>
+                            <li>训练模型，并获取满足阈值的团伙</li>
+                            <li>对每个团伙，查看团伙成员是否有被封禁、加黑，有则给这个团伙打上风险标签</li>
+                            <li>对所有抽取出来的团伙，进行BI报表监控</li>
+                            <li>只保留风险团伙用户节点，以及用户节点关联的特征节点，减少计算量</li>
+                        </ol>
+
+                        <h4>实时部分</h4>
+                        <ol>
+                            <li>用户注册时，从hbase获取所需要的特征</li>
+                            <li>获取新用户所在图中特征节点对应的权重，并获取特征节点关联的所有用户节点</li>
+                            <li>计算新用户与关联用户之间的相似度，如果大于阈值则认为新用户属于该用户的风险团伙</li>
+                        </ol>
+                    </section>
+
+                    <!-- 附录 -->
+                    <strong>代码链接:</strong> https://sirijr.github.io/account-security-work.html
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 返回顶部按钮 -->
+    <a href="#" class="back-to-top">
+        <i class="bi bi-arrow-up"></i>
+    </a>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h5>风控内容安全技术文档</h5>
+                    <p>分享最前沿的内容安全技术与实践</p>
+                </div>
+                <div class="col-lg-6 text-lg-end">
+                    <p>© 2025 风控技术团队. 保留所有权利.</p>
+                    <p>
+                        <a href="#" class="text-white me-2"><i class="bi bi-github"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-envelope"></i></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        // 初始化代码高亮
+        hljs.highlightAll();
+
+        // 返回顶部按钮功能
+        const backToTop = document.querySelector('.back-to-top');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+
+        // 代码复制功能
+        document.querySelectorAll('.code-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const codeBlock = this.closest('.code-block');
+                const code = codeBlock.querySelector('code').innerText;
+
+                // 复制到剪贴板
+                navigator.clipboard.writeText(code)
+                    .then(() => {
+                        // 显示复制成功反馈
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<i class="bi bi-check"></i> 已复制';
+                        this.classList.add('copied');
+
+                        // 2秒后恢复原始状态
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                            this.classList.remove('copied');
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('复制失败:', err);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
